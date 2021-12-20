@@ -5,7 +5,7 @@
 - [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol
 - [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture
 - [RFC2811](https://tools.ietf.org/html/rfc2811): Channel Management
-- [RFC2812](https://tools.ietf.org/html/rfc2812): Client
+- [RFC2812](https://tools.ietf.org/html/rfc2812): Client Protocol
 - [RFC2813](https://tools.ietf.org/html/rfc2813): Server Protocol
 - [RFC7194](https://tools.ietf.org/html/rfc7194): Default Port for Internet Relay Chat (IRC) via TLS/SSL
 - [RFC952](https://datatracker.ietf.org/doc/html/rfc952): DOD INTERNET HOST TABLE SPECIFICATION
