@@ -10,7 +10,7 @@ May 1993
 このメモでは，インターネットコミュニティのための実験的なプロトコルを定義しています．改善のための議論と提案が望まれます．このプロトコルの標準化状態やステータスについては，「IAB Official Protocol Standards」の最新版を参照してください．このメモの配布は無制限です．
 
 ## Abstract
-IRCプロトコルは，BBSでユーザー同士がチャットする手段として実装されて以来，4年の歳月をかけて開発されたものです．現在では，世界中に広がるサーバとクライアントのネットワークをサポートし，その成長に対応できるような体制を整えています．過去2年間で，IRCの主要ネットワークに接続しているユーザーの平均人数は10倍に増加しています．
+IRCプロトコルは，BBSでユーザ同士がチャットする手段として実装されて以来，4年の歳月をかけて開発されたものです．現在では，世界中に広がるサーバとクライアントのネットワークをサポートし，その成長に対応できるような体制を整えています．過去2年間で，IRCの主要ネットワークに接続しているユーザの平均人数は10倍に増加しています．
 
 IRCプロトコルはテキストベースのプロトコルであり，最も単純なクライアントはサーバに接続可能な任意のソケットプログラムです．
 
@@ -162,9 +162,9 @@ IRC自体は電話会議システムで，クライアント・サーバモデ�
 クライアントとは，他のサーバではないサーバに接続するものです．各クライアントは，最大9文字のユニークなニックネームによって他のクライアントと区別されます．ニックネームに使用できるもの，できないものについては，プロトコルの文法規則を参照してください．ニックネームに加えて，全てのサーバは全てのクライアントに関する以下の情報を 持っていなければなりません: クライアントが動作しているホストの実名，そのホスト上でのクライアントの ユーザ名，クライアントが接続しているサーバ．
 
 #### 1.2.1 Operators
-IRCネットワーク内の秩序を保つために，特別なクライアント（オペレーター）がネットワーク上で一般的なメンテナンス機能を実行することが許されています．オペレータに与えられた権限は「危険」とみなされることもありますが，それにもかかわらず，それらは必要とされます．オペレータは，不正なネットワーク・ルーティングの長期使用を防ぐために，必要に応じてサーバの切断や再接続などの基本的なネットワーク・タスクを実行できるようにする必要があります．この必要性を認識し，ここで議論されるプロトコルは，オペレータのみがそのような機能を実行できるように規定しています．[4.1.7 (SQUIT)](#417-server-quit-message) と [4.3.5 (CONNECT)](#435-connect-message) の項を参照してください．
+IRCネットワーク内の秩序を保つために，特別なクライアント（オペレータ）がネットワーク上で一般的なメンテナンス機能を実行することが許されています．オペレータに与えられた権限は「危険」とみなされることもありますが，それにもかかわらず，それらは必要とされます．オペレータは，不正なネットワーク・ルーティングの長期使用を防ぐために，必要に応じてサーバの切断や再接続などの基本的なネットワーク・タスクを実行できるようにする必要があります．この必要性を認識し，ここで議論されるプロトコルは，オペレータのみがそのような機能を実行できるように規定しています．[4.1.7 (SQUIT)](#417-server-quit-message) と [4.3.5 (CONNECT)](#435-connect-message) の項を参照してください．
 
-オペレータの権限でもっと議論を呼ぶのは，接続されたネットワークからユーザーを「強制的」に排除する能力，つまりオペレータは任意のクライアントとサーバ間の接続を閉じることができることです．その乱用は破壊的で迷惑なものであるため，これを正当化するのは微妙なところです．この種の動作の詳細については，セクション [4.6.1 (KILL)](#461-kill-message) を参照してください．
+オペレータの権限でもっと議論を呼ぶのは，接続されたネットワークからユーザを「強制的」に排除する能力，つまりオペレータは任意のクライアントとサーバ間の接続を閉じることができることです．その乱用は破壊的で迷惑なものであるため，これを正当化するのは微妙なところです．この種の動作の詳細については，セクション [4.6.1 (KILL)](#461-kill-message) を参照してください．
 
 ### 1.3 Channels
 チャネルは，そのチャネル宛てのメッセージをすべて受信する，1つまたは複数のクライアントの名前付きグループです．チャネルは，最初のクライアントが参加したときに暗黙のうちに作成され，最後のクライアントが離脱したときに消滅します．チャネルが存在する間は，どのクライアントもチャネルの名前を使用してチャネルを参照することができます．
@@ -173,12 +173,12 @@ IRCネットワーク内の秩序を保つために，特別なクライアン�
 
 このプロトコルでは，2種類のチャネルが認められています．1つは，ネットワークに接続されているすべてのサーバが知っている分散チャネルです．これらのチャネルは，最初の文字が，そのチャネルが存在するサーバ上のクライアントのみが参加できることでマークされています．これらのチャネルは，先頭の ’&’ 文字で区別されます．この2つのタイプの他に，個々のチャネルの特性を変更するために，様々なチャネルモードがあります．これについての詳細は [4.2.3 (MODE コマンド)](#423-mode-message) を参照してください．
 
-新しいチャネルを作成したり，既存のチャネルの一部になるには，ユーザはチャネルに参加する必要があります．参加する前にチャネルが存在しない場合，チャネルは作成され，作成ユーザはチャネルオペレータになります．チャネルが既に存在する場合，そのチャネルへの JOIN 要求が受け入れられるかどうかは，チャネルの現在のモードによって異なります．たとえば，チャネルが招待制 (+i) の場合，あなたは招待された場合のみ参加できます．プロトコルの一部として，ユーザーは同時に複数のチャネルに参加することができますが，経験豊富なユーザーと初心者ユーザーの両方にとって十分であるとして，10チャネルに制限することが推奨されています．これについては，[8.13 Channel membership](#813-channel-membership)を参照してください．
+新しいチャネルを作成したり，既存のチャネルの一部になるには，ユーザはチャネルに参加する必要があります．参加する前にチャネルが存在しない場合，チャネルは作成され，作成ユーザはチャネルオペレータになります．チャネルが既に存在する場合，そのチャネルへの JOIN 要求が受け入れられるかどうかは，チャネルの現在のモードによって異なります．たとえば，チャネルが招待制 (+i) の場合，あなたは招待された場合のみ参加できます．プロトコルの一部として，ユーザは同時に複数のチャネルに参加することができますが，経験豊富なユーザと初心者ユーザの両方にとって十分であるとして，10チャネルに制限することが推奨されています．これについては，[8.13 Channel membership](#813-channel-membership)を参照してください．
 
 2つのサーバ間の分割によりIRCネットワークが分断された場合，それぞれの側のチャネルは，分割されたそれぞれの側のサーバに接続されているクライアントのみで構成され，分割された一方の側で存在しなくなる可能性があります．分割が完了すると，接続サーバはそれぞれのチャネルにいると思われる人とそのチャネルのモードを互いに発表します．チャネルが両側に存在する場合，JOIN と MODE は包括的に解釈され，新しい接続の両側が，どのクライアントがチャネルにいるか，チャネルがどのようなモードを持っているかについて合意するようにします．
 
 #### 1.3.1 Channel Operators
-あるチャネルのチャネル・オペレータ（「チョップ」または「チャノップ」とも呼ばれる）は，そのチャネルを「所有」しているとみなされます．このステータスを認識し，チャネル・オペレータは自分のチャネルをコントロールし，ある種の健全性を保つことができる一定の権限を与えられています． しかし，彼らの行動が一般的に反社会的であったり，虐待的である場合，IRCオペレータに介入を依頼したり，ユーザーが他のチャネルに移動して，自分たちのチャネルを形成することは妥当なことかもしれません．
+あるチャネルのチャネル・オペレータ（「チョップ」または「チャノップ」とも呼ばれる）は，そのチャネルを「所有」しているとみなされます．このステータスを認識し，チャネル・オペレータは自分のチャネルをコントロールし，ある種の健全性を保つことができる一定の権限を与えられています． しかし，彼らの行動が一般的に反社会的であったり，虐待的である場合，IRCオペレータに介入を依頼したり，ユーザが他のチャネルに移動して，自分たちのチャネルを形成することは妥当なことかもしれません．
 
 チャネルオペレータのみが使用できるコマンドは以下の通りです．
 
@@ -294,10 +294,10 @@ NOTES:
 IRCの主な目的は，簡単かつ効率的にコンファレンス（1対多の会話）を行うことができるフォーラムを提供することです．IRCはこれを実現するためにいくつかの手段を提供しており，それぞれが独自の目的をもっています．
 
 #### 3.2.1 To a list
-1対多の会話で最も効率が悪いのは，クライアントがユーザーの’リスト’と会話するスタイルです．クライアントがメッセージの配送先のリストを与えると，サーバはそれを分割して，指定された配送先ごとにメッセージのコピーを送信します． これは，宛先リストが分割され，各経路に重複して送信されないことを確認せずにディスパッチが送信されるため，グループを使用する場合よりも効率的ではありません．
+1対多の会話で最も効率が悪いのは，クライアントがユーザの’リスト’と会話するスタイルです．クライアントがメッセージの配送先のリストを与えると，サーバはそれを分割して，指定された配送先ごとにメッセージのコピーを送信します． これは，宛先リストが分割され，各経路に重複して送信されないことを確認せずにディスパッチが送信されるため，グループを使用する場合よりも効率的ではありません．
 
 #### 3.2.2 To a group (channel)
-IRCでは，チャネルはマルチキャストグループと同等の役割を持っています．その存在は動的であり（人々がチャネルに参加したり離れたりすることで行ったり来たりする），チャネル上で行われる実際の会話は，与えられたチャネル上のユーザーをサポートしているサーバにのみ送信されます．同じチャネルのサーバに複数のユーザーがいる場合，メッセージテキストはそのサーバに一度だけ送信され，その後チャネル内の各クライアントに送信されます．この動作は，元のメッセージが広がってチャネルの各メンバーに到達するまで，クライアントとサーバの組み合わせごとに繰り返されます．
+IRCでは，チャネルはマルチキャストグループと同等の役割を持っています．その存在は動的であり（人々がチャネルに参加したり離れたりすることで行ったり来たりする），チャネル上で行われる実際の会話は，与えられたチャネル上のユーザをサポートしているサーバにのみ送信されます．同じチャネルのサーバに複数のユーザがいる場合，メッセージテキストはそのサーバに一度だけ送信され，その後チャネル内の各クライアントに送信されます．この動作は，元のメッセージが広がってチャネルの各メンバーに到達するまで，クライアントとサーバの組み合わせごとに繰り返されます．
 
 以下の例は，すべて図2を参照しています．
 
@@ -314,10 +314,10 @@ IRCでは，チャネルはマルチキャストグループと同等の役割�
     クライアント1，2，3がチャネルを持つ．チャネルへのすべてのメッセージは，すべてのクライアントに送信され，それが単一のクライアントへのプライベートメッセージである場合，メッセージが通過しなければならないサーバにのみ送信されます．クライアント1がメッセージを送信すると，それはクライアント2に戻り，サーバBを経由してクライアント3に届きます．
 
 #### 3.2.3 To a host/server mask
-IRCの運営者が，関連する多くのユーザーにメッセージを送るための何らかの仕組みを提供するために，ホストとサーバのマスクメッセージが提供されています．これらのメッセージは，ホストまたはサーバ情報がマスクに一致するユーザに送られます．メッセージは，チャネルと同様の方法で，ユーザがいる場所にのみ送信されます．
+IRCの運営者が，関連する多くのユーザにメッセージを送るための何らかの仕組みを提供するために，ホストとサーバのマスクメッセージが提供されています．これらのメッセージは，ホストまたはサーバ情報がマスクに一致するユーザに送られます．メッセージは，チャネルと同様の方法で，ユーザがいる場所にのみ送信されます．
 
 ### 3.3 One-to-all
-1対全のメッセージはブロードキャストメッセージと呼ばれ，すべてのクライアントまたはサーバ，あるいはその両方に送信されます．ユーザーとサーバからなる大規模なネットワークでは，1つのメッセージによって，希望するすべての宛先に到達するために，ネットワーク上で多くのトラフィックが送信されることになります．
+1対全のメッセージはブロードキャストメッセージと呼ばれ，すべてのクライアントまたはサーバ，あるいはその両方に送信されます．ユーザとサーバからなる大規模なネットワークでは，1つのメッセージによって，希望するすべての宛先に到達するために，ネットワーク上で多くのトラフィックが送信されることになります．
 
 メッセージによっては，各サーバが持つ状態情報がサーバ間で適度に整合するように，全サーバにブロードキャストする以外の選択肢はありません．
 
@@ -328,7 +328,7 @@ IRCの運営者が，関連する多くのユーザーにメッセージを送�
 状態情報の変更をもたらすコマンド（チャネルメンバーシップ，チャネルモード，ユーザステータスなど）のほとんどは，デフォルトですべてのサーバに送信されなければならず，この配布はクライアントによって変更することができません．
 
 #### 3.3.3 Server-to-Server.
-サーバ間のほとんどのメッセージは，すべての’他の’サーバに配布されますが，これは，ユーザー，チャネル，サーバのいずれかに影響を与えるメッセージにのみ必要です．これらは IRC で見られる基本的な項目ですので，あるサーバから発信されたほぼすべてのメッセージは，接続されている他のすべてのサーバにブロードキャストされます．
+サーバ間のほとんどのメッセージは，すべての’他の’サーバに配布されますが，これは，ユーザ，チャネル，サーバのいずれかに影響を与えるメッセージにのみ必要です．これらは IRC で見られる基本的な項目ですので，あるサーバから発信されたほぼすべてのメッセージは，接続されている他のすべてのサーバにブロードキャストされます．
 
 ## 4. MESSAGE DETAILS
 以下のページでは，IRCサーバとクライアントが認識する各メッセージについて説明します．このセクションで説明されているすべてのコマンドは，このプロトコルのための任意のサーバで実装されている必要があります．
@@ -348,7 +348,7 @@ ERR_NOSUCHSERVER が記載されている場合，パラメータが見つから
 このような例は，サーバ間で転送中の「名前」からのメッセージを表し，リモートサーバが正しい経路で返信できるように，メッセージの元の送信者の名前を含めることが重要です．
 
 ### 4.1 Connection Registration
-ここで説明するコマンドは，IRCサーバにユーザーまたはサーバとして接続を登録し，正しく切断するために使用されます．
+ここで説明するコマンドは，IRCサーバにユーザまたはサーバとして接続を登録し，正しく切断するために使用されます．
 
 "PASS" コマンドは，クライアント接続，サーバ接続のいずれにおいても登録する必要はありませんが，サーバメッセージまたはNICK/USERの組み合わせの後者に先行させる必要があります．実際の接続にある程度のセキュリティを与えるために，すべてのサーバ接続にパスワードを設定することを強くお勧めします．クライアントが登録する際の推奨順序は以下の通りです．
 
@@ -379,7 +379,7 @@ Example:
 Parameters:  <nickname> [ <hopcount> ]
 ```
 
-NICKメッセージは，ユーザーにニックネームを与えたり，以前のニックネームを変更するために使用されます．このパラメータは，ニックネームがホームサーバからどれくらい離れているかを示すために，サーバによってのみ使用されます．ローカル接続の場合，hopcountは 0 になります．クライアントから提供された場合，これは無視されなければなりません．
+NICKメッセージは，ユーザにニックネームを与えたり，以前のニックネームを変更するために使用されます．このパラメータは，ニックネームがホームサーバからどれくらい離れているかを示すために，サーバによってのみ使用されます．ローカル接続の場合，hopcountは 0 になります．クライアントから提供された場合，これは無視されなければなりません．
 
 他のクライアントの同じニックネームを既に知っているサーバにNICKメッセージが到着した場合，ニックネームの衝突が発生します． ニックネームの衝突の結果，そのニックネームのすべてのインスタンスがサーバのデータベースから削除され，KILL コマンドが他のすべてのサーバのデータベースからそのニックネームを削除するために発行されます．衝突の原因となった NICK メッセージがニックネームの変更であった場合，元の（古い）ニックネームも同様に削除されなければなりません．
 
@@ -405,11 +405,11 @@ Parameters:  <username> <hostname> <servername> <realname>
 
 USER メッセージは，接続の最初に新しいユーザのユーザ名，ホスト名，サーバ名，実名 を指定するために使用されます．また，サーバ間の通信でも，新しいユーザがIRCに到着したことを示すために使われます．なぜなら，クライアントからUSERとNICKの両方を受け取って初めて，ユーザが登録されるからです．
 
-サーバ間では，USERの前にクライアントのNICKnameを付ける必要があります． ホスト名とサーバ名は，通常，IRCサーバが直接接続されたクライアントからUSERコマンドが来た場合には(セキュリティ上の理由から)無視されますが，サーバ間の通信では使用されることに注意してください．つまり，新しいユーザーをネットワークの他の部分に紹介するときには，必ずNICKをリモートサーバに送信してから，付随するUSERを送信しなければなりません．
+サーバ間では，USERの前にクライアントのNICKnameを付ける必要があります． ホスト名とサーバ名は，通常，IRCサーバが直接接続されたクライアントからUSERコマンドが来た場合には(セキュリティ上の理由から)無視されますが，サーバ間の通信では使用されることに注意してください．つまり，新しいユーザをネットワークの他の部分に紹介するときには，必ずNICKをリモートサーバに送信してから，付随するUSERを送信しなければなりません．
 
 realnameパラメータは，スペース文字を含む可能性があるため，最後のパラメータとする必要があり，そのように認識されるようにコロン（’:’）を先頭に付ける必要があることに注意しなければなりません．
 
-USERメッセージのみに依存すると，クライアントがユーザー名について簡単に嘘をつ くことができるため，「IDサーバ」の使用を推奨します．ユーザーが接続するホストでこのようなサーバが有効になっている場合，ユーザー名は「IDサーバ」からの返信と同じように設定されます．
+USERメッセージのみに依存すると，クライアントがユーザ名について簡単に嘘をつ くことができるため，「IDサーバ」の使用を推奨します．ユーザが接続するホストでこのようなサーバが有効になっている場合，ユーザ名は「IDサーバ」からの返信と同じように設定されます．
 
 Numeric Replies:
 ```
@@ -419,7 +419,7 @@ Numeric Replies:
 Examples:
 ```
 USER guest tolmoon tolsun :Ronnie Reagan
-        ; ユーザー名「guest」，本名「Ronnie Reagan」で登録されたユーザー
+        ; ユーザ名「guest」，本名「Ronnie Reagan」で登録されたユーザ
 
 :testnick USER guest tolmoon tolsun :Ronnie Reagan
         ; USERコマンドが属するニックネームで，サーバ間でメッセージをやり取りします
@@ -461,7 +461,7 @@ Parameters:  <user> <password>
 
 OPER メッセージは，一般ユーザがオペレータ権限を取得するために使用します．Operator権限を取得するためには，\<user\>と\<password\>の組み合わせが必要です．
 
-OPERコマンドを送信したクライアントが，指定されたユーザーの正しいパスワードを提供した場合，サーバはクライアントのニックネームに対して"MODE +o"を発行して，新しいオペレーターをネットワークの残りの部分に通知します．
+OPERコマンドを送信したクライアントが，指定されたユーザの正しいパスワードを提供した場合，サーバはクライアントのニックネームに対して"MODE +o"を発行して，新しいオペレータをネットワークの残りの部分に通知します．
 
 OPERメッセージは，クライアント・サーバのみです．
 
@@ -473,7 +473,7 @@ Numeric Replies:
 
 Example:
 ```
-OPER foo bar    ; ユーザー名に "foo"，パスワードに "bar "を使ってオペレータ登録を試みます．
+OPER foo bar    ; ユーザ名に "foo"，パスワードに "bar "を使ってオペレータ登録を試みます．
 ```
 
 #### 4.1.6 Quit message
@@ -506,7 +506,7 @@ Parameters:  <server> <comment>
 
 SQUITメッセージは，終了したサーバや死んだサーバを伝えるために必要です． あるサーバが他のサーバとの接続を切断したい場合，SQUIT メッセージを他のサーバに送信する必要があります．その際，サーバパラメータとして他のサーバ名を指定します．
 
-このコマンドは，IRCサーバのネットワークを秩序正しく接続するために，オペレーターも利用できます．オペレータは，リモートサーバ接続のために SQUIT メッセージを発行することもできます．この場合，SQUITはオペレータとリモートサーバの間にある各サーバによって解析されなければならず，以下に説明するように各サーバによって保持されるネットワークのビューが更新されます．
+このコマンドは，IRCサーバのネットワークを秩序正しく接続するために，オペレータも利用できます．オペレータは，リモートサーバ接続のために SQUIT メッセージを発行することもできます．この場合，SQUITはオペレータとリモートサーバの間にある各サーバによって解析されなければならず，以下に説明するように各サーバによって保持されるネットワークのビューが更新されます．
 
 \<comment\>は，（現在接続していない）リモートサーバに対してSQUITを実行するすべてのオペレータが，このアクションの理由を他のオペレータに認識させるために提供されるべきです．\<comment\> はまた，エラーまたは同様のメッセージを表示するサーバによって記入されます．
 
@@ -531,7 +531,7 @@ SQUIT tolsun.oulu.fi :Bad Link?
 ```
 
 ### 4.2 Channel operations
-This group of messages is concerned with manipulating channels, their properties (channel modes), and their contents (typically clients).  In implementing these, a number of race conditions are inevitable when clients at opposing ends of a network send commands which will ultimately clash. It is also required that servers keep a nickname history to ensure that wherever a parameter is given, the server check its history in case it has recently been changed.
+このメッセージ群は，チャネル，そのプロパティ（チャネルモード），およびそのコンテンツ（通常はクライアント）を操作することに関係しています． これらの実装では，ネットワークの反対側の端にいるクライアントがコマンドを送ると，最終的に衝突してしまうため，多くのレースコンディションが避けられない．また，パラメータが与えられると，それが最近変更された場合に備えてサーバがその履歴をチェックすることを確実にするために，サーバがニックネームの履歴を保持することが要求されます．
 
 #### 4.2.1 Join message
 ```
@@ -539,17 +539,17 @@ This group of messages is concerned with manipulating channels, their properties
 Parameters:  <channel>{,<channel>} [<key>{,<key>}]
 ```
 
-The JOIN command is used by client to start listening a specific channel. Whether or not a client is allowed to join a channel is checked only by the server the client is connected to; all other servers automatically add the user to the channel when it is received from other servers. The conditions which affect this are as follows:
+JOINコマンドは，クライアントが特定のチャネルのリスニングを開始するために使用されます．クライアントがチャネルに参加できるかどうかは，クライアントが接続しているサーバのみが確認します．他のサーバは，他のサーバからチャネルを受信すると，自動的にユーザをチャネルに追加します．これに影響する条件は以下の通りです．
 
-1. the user must be invited if the channel is invite-only;
-2. the user’s nick/username/hostname must not match any active bans;
-3. the correct key (password) must be given if it is set.
+1. チャネルが招待制である場合，ユーザは招待されていなければなりません．
+2. ユーザのニックネーム/ユーザ名/ホスト名は，アクティブな禁止事項にマッチしてはいけません．
+3. 正しいキー(パスワード)が設定されている場合は，それを入力しなければなりません．
 
-These are discussed in more detail under the MODE command (see section 4.2.3 for more details).
+これらについては，MODEコマンドで詳しく説明します（詳細は[4.2.3 Mode message](#423-mode-message)項を参照してください）．
 
-Once a user has joined a channel, they receive notice about all commands their server receives which affect the channel. This includes MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE. The JOIN command needs to be broadcast to all servers so that each server knows where to find the users who are on the channel. This allows optimal delivery of PRIVMSG/NOTICE messages to the channel.
+ユーザがチャネルに参加すると，そのチャネルに影響を与えるサーバが受け取るすべてのコマンドに関する通知を受け取ります．これには，MODE，KICK，PART，QUITや，もちろんPRIVMSG/NOTICEが含まれます．JOINコマンドは，各サーバがチャネルに参加しているユーザをどこで見つけることができるかを知るために，すべてのサーバにブロードキャストされる必要があります．これにより，PRIVMSG/NOTICEメッセージのチャネルへの最適な配信が可能になります．
 
-If a JOIN is successful, the user is then sent the channel’s topic (using RPL_TOPIC) and the list of users who are on the channel (using RPL_NAMREPLY), which must include the user joining.
+JOINが成功すると，ユーザにチャネルのトピック（RPL_TOPICを使用）とチャネルに参加しているユーザのリスト（RPL_NAMREPLYを使用）が送られますが，これには参加しているユーザを含める必要があります．
 
 Numeric Replies:
 ```
@@ -562,17 +562,17 @@ Numeric Replies:
 
 Examples:
 ```
-JOIN #foobar                ; join channel #foobar.
+JOIN #foobar                ; チャネル #foobar に参加します．
 
-JOIN &foo fubar             ; join channel &foo using key "fubar".
+JOIN &foo fubar             ; "fubar"をキーにチャネル &foo に参加します．
 
-JOIN #foo,&bar fubar        ; join channel #foo using key "fubar" and &bar using no key.
+JOIN #foo,&bar fubar        ; チャネル #foo にキー "fubar" で，&bar にキー無しで参加します．
 
-JOIN #foo,#bar fubar,foobar ; join channel #foo using key "fubar".  and channel #bar using key "foobar".
+JOIN #foo,#bar fubar,foobar ; キー "fubar" を使ってチャネル #foo に参加し，キー "foobar" を使ってチャネル #bar に参加します．
 
-JOIN #foo,#bar              ; join channels #foo and #bar.
+JOIN #foo,#bar              ; チャネル #foo と #bar に参加します．
 
-:WiZ JOIN #Twilight_zone    ; JOIN message from WiZ
+:WiZ JOIN #Twilight_zone    ; WiZからのJOINメッセージ
 ```
 
 #### 4.2.2 Part message
@@ -581,7 +581,7 @@ JOIN #foo,#bar              ; join channels #foo and #bar.
 Parameters:  <channel>{,<channel>}
 ```
 
-The PART message causes the client sending the message to be removed from the list of active users for all given channels listed in the parameter string.
+PARTメッセージは，メッセージを送信したクライアントを，パラメータ文字列で指定されたすべてのチャネルのアクティブユーザ一覧から削除します．
 
 Numeric Replies:
 ```
@@ -591,9 +591,9 @@ Numeric Replies:
 
 Examples:
 ```
-PART #twilight_zone    ; leave channel "#twilight_zone"
+PART #twilight_zone    ; チャネル "#twilight_zone" を離脱します．
 
-PART #oz-ops,&group5   ; leave both channels "&group5" and "#oz-ops".
+PART #oz-ops,&group5   ; "&group5" と "#oz-ops" の両方のチャネルを離脱します．
 ```
 
 #### 4.2.3 Mode message
@@ -601,54 +601,54 @@ PART #oz-ops,&group5   ; leave both channels "&group5" and "#oz-ops".
 Command: MODE
 ```
 
-The MODE command is a dual-purpose command in IRC. It allows both usernames and channels to have their mode changed. The rationale for this choice is that one day nicknames will be obsolete and the equivalent property will be the channel.
+MODEコマンドは，IRCでは2つの用途を持つコマンドです．これはユーザ名とチャネルの両方にモードを変更させることができます．この選択の根拠は，いつの日かニックネームが廃れ，同等のプロパティがチャネルになることです．
 
-When parsing MODE messages, it is recommended that the entire message be parsed first and then the changes which resulted then passed on.
+MODEメッセージを解析する場合，まずメッセージ全体を解析し，その結果生じた変更を引き継ぐことをお勧めします．
 
 ##### 4.2.3.1 Channel modes
 ```
 Parameters:  <channel> {[+|-]|o|p|s|i|t|n|b|v} [<limit>] [<user>] [<ban mask>]
 ```
 
-The MODE command is provided so that channel operators may change the characteristics of ‘their’ channel. It is also required that servers be able to change channel modes so that channel operators may be created.
+MODEコマンドは，チャネルオペレータが「自分の」チャネルの特性を変更できるように提供されています．また，チャネルオペレータを作成するために，サーバがチャネルモードを変更できることが要求されます．
 
-The various modes available for channels are as follows:
+チャネルに用意されている各種モードは以下の通りです．
 
 ```
-    o - give/take channel operator privileges;
-    p - private channel flag;
-    s - secret channel flag;
-    i - invite-only channel flag;
-    t - topic settable by channel operator only flag;
-    n - no messages to channel from clients on the outside;
-    m - moderated channel;
-    l - set the user limit to channel;
-    b - set a ban mask to keep users out;
-    v - give/take the ability to speak on a moderated channel;
-    k - set a channel key (password).
+    o - チャネルオペレータの特権を与えます/奪います;
+    p - プライベートチャネルフラグ;
+    s - シークレットチャネルフラグ;
+    i - 招待専用チャネルフラグ;
+    t - チャネルオペレータだけが設定可能なトピックフラグ;
+    n - 外部のクライアントからチャネルへのメッセージの受信を禁止します;
+    m - モデレートされたチャネル;
+    l - チャネルへのユーザ制限を設定します;
+    b - ユーザを閉め出すためのバンマスクを設定します;
+    v - モデレートされたチャネルで発言する能力を与えます/奪います;
+    k - チャネルキー（パスワード）を設定します.
 ```
 
-When using the ’o’ and ’b’ options, a restriction on a total of three per mode command has been imposed. That is, any combination of ’o’ and
+’o’ と ’b’ オプションを使用する場合，1つのモードコマンドにつき合計3つまでという制限が課されます．つまり，’o’ と ’b’ の組み合わせは，1つのモードコマンドにつき，合計3つまでという制限があります．
 
 ##### 4.2.3.2 User modes
 ```
 Parameters:  <nickname> {[+|-]|i|w|s|o}
 ```
 
-The user MODEs are typically changes which affect either how the client is seen by others or what ’extra’ messages the client is sent.  A user MODE command may only be accepted if both the sender of the message and the nickname given as a parameter are both the same.
+ユーザモードは通常，クライアントが他者からどのように見られるか，またはクライアントがどのような「追加」メッセージを送信するかに影響する変更です．ユーザMODEコマンドは，メッセージの送信者とパラメータとして与えられたニックネームの両方が同じである場合にのみ受け入れることができます．
 
-The available modes are as follows:
+使用可能なモードは以下の通りです．
 
 ```
-    i - marks a users as invisible;
-    s - marks a user for receipt of server notices;
-    w - user receives wallops;
-    o - operator flag.
+    i - ユーザを非表示にします;
+    s - サーバからのお知らせを受信するユーザをマークします;
+    w - ユーザは，Wallopsを受け取ります;
+    o - オペレータフラグ．
 ```
 
-Additional modes may be available later on.
+後日，追加モードも用意される予定です．
 
-If a user attempts to make themselves an operator using the "+o" flag, the attempt should be ignored. There is no restriction, however, on anyone ‘deopping’ themselves (using "-o").
+ユーザが "+o" フラグを使用して自分自身をオペレータにしようとした場合，その試みは無視されるべきです．しかし，"-o" を使って自分自身をオペレータから外すことには何の制限もありません．
 
 Numeric Replies:
 ```
@@ -666,31 +666,31 @@ Examples:
 ```
 Use of Channel Modes:
 
-MODE #Finnish +im       ; Makes #Finnish channel moderated and ’invite-only’.
+MODE #Finnish +im       ; #Finish のチャネルをモデレートされた「招待制」にします．
 
-MODE #Finnish +o Kilroy ; Gives ’chanop’ privileges to Kilroy on channel #Finnish.
+MODE #Finnish +o Kilroy ; チャネル #Finnish で Kilroy に ’chanop’ 権限を付与します．
 
-MODE #Finnish +v Wiz    ; Allow WiZ to speak on #Finnish.
+MODE #Finnish +v Wiz    ; WiZに #Finnish で発言するのを許可します．
 
-MODE #Fins -s           ; Removes ’secret’ flag from channel #Fins.
+MODE #Fins -s           ; チャネル #Fins から 'secret' フラグを削除します．
 
-MODE #42 +k oulu        ; Set the channel key to "oulu".
+MODE #42 +k oulu        ; チャネルキーを "oulu" に設定します．
 
-MODE #eu-opers +l 10    ; Set the limit for the number of users on channel to 10.
+MODE #eu-opers +l 10    ; チャネルのユーザ数制限を10に設定します．
 
-MODE &oulu +b           ; list ban masks set for channel.
+MODE &oulu +b           ; チャネルに設定されたバンマスクをリストアップします．
 
-MODE &oulu +b !@*       ; prevent all users from joining.
+MODE &oulu +b !@*       ; すべてのユーザを参加させないようにします．
 
-MODE &oulu +b !@*.edu   ; prevent any user from a hostname matching *.edu from joining.
+MODE &oulu +b !@*.edu   ; ホスト名が \*.edu に一致するユーザが参加できないようにします．
 
 Use of user Modes:
 
-:MODE WiZ -w            ; turns reception of WALLOPS messages off for WiZ.
+:MODE WiZ -w            ; WiZ の WALLOPS メッセージの受信をオフにします．
 
-:Angel MODE Angel +i    ; Message from Angel to make themselves invisible.
+:Angel MODE Angel +i    ; Angle からのメッセージを自分自身へ非表示にします．
 
-MODE WiZ -o             ; WiZ ’deopping’ (removing operator status). The plain reverse of this command ("MODE WiZ +o") must not be allowed from users since would bypass the OPER command.
+MODE WiZ -o             ; WiZ をオペレータでなくします（オペレータの状態を解除する．）このコマンドの逆（"MODE WiZ +o"）は，OPERコマンドをバイパスしてしまうので，ユーザから許可されてはいけません．
 ```
 
 #### 4.2.4 Topic message
