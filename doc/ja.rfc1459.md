@@ -10,9 +10,9 @@ May 1993
 このメモでは，インターネットコミュニティのための実験的なプロトコルを定義しています．改善のための議論と提案が望まれます．このプロトコルの標準化状態やステータスについては，「IAB Official Protocol Standards」の最新版を参照してください．このメモの配布は無制限です．
 
 ## Abstract
-IRCプロトコルは，BBSでユーザー同士がチャットする手段として実装されて以来，4年の歳月をかけて開発されたものです．現在では，世界中に広がるサーバーとクライアントのネットワークをサポートし，その成長に対応できるような体制を整えています．過去2年間で，IRCの主要ネットワークに接続しているユーザーの平均人数は10倍に増加しています．
+IRCプロトコルは，BBSでユーザー同士がチャットする手段として実装されて以来，4年の歳月をかけて開発されたものです．現在では，世界中に広がるサーバとクライアントのネットワークをサポートし，その成長に対応できるような体制を整えています．過去2年間で，IRCの主要ネットワークに接続しているユーザーの平均人数は10倍に増加しています．
 
-IRCプロトコルはテキストベースのプロトコルであり，最も単純なクライアントはサーバーに接続可能な任意のソケットプログラムです．
+IRCプロトコルはテキストベースのプロトコルであり，最も単純なクライアントはサーバに接続可能な任意のソケットプログラムです．
 
 <details>
 <summary>Table of Contents</summary>
@@ -131,10 +131,10 @@ IRC（Internet Relay Chat）プロトコルは，テキストベースの会議�
 
 IRCプロトコルは，TCP/IPネットワークプロトコルを使用するシステム上で開発されましたが，このプロトコルが動作する唯一の領域である必要はありません．
 
-IRC自体は電話会議システムで，クライアント・サーバーモデルを採用しているため，多くのマシンで分散して動作させるのに適しています．典型的なセットアップは，単一のプロセス（サーバー）がクライアント（または他のサーバー）が接続するための中心点を形成し，必要なメッセージの配信/多重化およびその他の機能を実行することです．
+IRC自体は電話会議システムで，クライアント・サーバモデルを採用しているため，多くのマシンで分散して動作させるのに適しています．典型的なセットアップは，単一のプロセス（サーバ）がクライアント（または他のサーバ）が接続するための中心点を形成し，必要なメッセージの配信/多重化およびその他の機能を実行することです．
 
 ### 1.1 Servers
-サーバーはIRCのバックボーンを形成し，クライアントが互いに会話するために接続するポイント，および他のサーバーがIRCネットワークを形成するために接続するポイントを提供します．IRCサーバーに許されるネットワーク構成は，スパニングツリー（図1参照）のみで，各サーバーは，それが見るネットの残りの部分に対して中心ノードとして機能します．
+サーバはIRCのバックボーンを形成し，クライアントが互いに会話するために接続するポイント，および他のサーバがIRCネットワークを形成するために接続するポイントを提供します．IRCサーバに許されるネットワーク構成は，スパニングツリー（図1参照）のみで，各サーバは，それが見るネットの残りの部分に対して中心ノードとして機能します．
 
 ```
              [ Server 15 ]   [ Server 13 ]      [ Server 14]
@@ -159,23 +159,23 @@ IRC自体は電話会議システムで，クライアント・サーバーモ�
 ```
 
 ### 1.2 Clients
-クライアントとは，他のサーバーではないサーバーに接続するものです．各クライアントは，最大9文字のユニークなニックネームによって他のクライアントと区別されます．ニックネームに使用できるもの，できないものについては，プロトコルの文法規則を参照してください．ニックネームに加えて，全てのサーバは全てのクライアントに関する以下の情報を 持っていなければなりません: クライアントが動作しているホストの実名，そのホスト上でのクライアントの ユーザ名，クライアントが接続しているサーバ．
+クライアントとは，他のサーバではないサーバに接続するものです．各クライアントは，最大9文字のユニークなニックネームによって他のクライアントと区別されます．ニックネームに使用できるもの，できないものについては，プロトコルの文法規則を参照してください．ニックネームに加えて，全てのサーバは全てのクライアントに関する以下の情報を 持っていなければなりません: クライアントが動作しているホストの実名，そのホスト上でのクライアントの ユーザ名，クライアントが接続しているサーバ．
 
 #### 1.2.1 Operators
-IRCネットワーク内の秩序を保つために，特別なクライアント（オペレーター）がネットワーク上で一般的なメンテナンス機能を実行することが許されています．オペレータに与えられた権限は「危険」とみなされることもありますが，それにもかかわらず，それらは必要とされます．オペレータは，不正なネットワーク・ルーティングの長期使用を防ぐために，必要に応じてサーバーの切断や再接続などの基本的なネットワーク・タスクを実行できるようにする必要があります．この必要性を認識し，ここで議論されるプロトコルは，オペレータのみがそのような機能を実行できるように規定しています．[4.1.7 (SQUIT)](#417-server-quit-message) と [4.3.5 (CONNECT)](#435-connect-message) の項を参照してください．
+IRCネットワーク内の秩序を保つために，特別なクライアント（オペレーター）がネットワーク上で一般的なメンテナンス機能を実行することが許されています．オペレータに与えられた権限は「危険」とみなされることもありますが，それにもかかわらず，それらは必要とされます．オペレータは，不正なネットワーク・ルーティングの長期使用を防ぐために，必要に応じてサーバの切断や再接続などの基本的なネットワーク・タスクを実行できるようにする必要があります．この必要性を認識し，ここで議論されるプロトコルは，オペレータのみがそのような機能を実行できるように規定しています．[4.1.7 (SQUIT)](#417-server-quit-message) と [4.3.5 (CONNECT)](#435-connect-message) の項を参照してください．
 
-オペレータの権限でもっと議論を呼ぶのは，接続されたネットワークからユーザーを「強制的」に排除する能力，つまりオペレータは任意のクライアントとサーバー間の接続を閉じることができることです．その乱用は破壊的で迷惑なものであるため，これを正当化するのは微妙なところです．この種の動作の詳細については，セクション [4.6.1 (KILL)](#461-kill-message) を参照してください．
+オペレータの権限でもっと議論を呼ぶのは，接続されたネットワークからユーザーを「強制的」に排除する能力，つまりオペレータは任意のクライアントとサーバ間の接続を閉じることができることです．その乱用は破壊的で迷惑なものであるため，これを正当化するのは微妙なところです．この種の動作の詳細については，セクション [4.6.1 (KILL)](#461-kill-message) を参照してください．
 
 ### 1.3 Channels
 チャネルは，そのチャネル宛てのメッセージをすべて受信する，1つまたは複数のクライアントの名前付きグループです．チャネルは，最初のクライアントが参加したときに暗黙のうちに作成され，最後のクライアントが離脱したときに消滅します．チャネルが存在する間は，どのクライアントもチャネルの名前を使用してチャネルを参照することができます．
 
 チャネル名は，200文字以内の文字列（’＆’または’#’で始まる文字）です．最初の文字が ’&’ または ’#’ であるという条件を除けば，チャネル名の唯一の制限は，スペース (’ ’)，コントロール G (^G または ASCII 7)，カンマ (’,’ はプロトコルではリスト項目の区切りとして使われます) を含まないということです．
 
-このプロトコルでは，2種類のチャネルが認められています．1つは，ネットワークに接続されているすべてのサーバが知っている分散チャネルです．これらのチャネルは，最初の文字が，そのチャネルが存在するサーバ上のクライアントのみが参加できることでマークされています．これらのチャネルは，先頭の ’&’ 文字で区別されます．この2つのタイプの他に，個々のチャネルの特性を変更するために，様々なチャネルモードがあります．これについての詳細は [4.2.3 (MODE コマンド)] (#423-mode-message) を参照してください．
+このプロトコルでは，2種類のチャネルが認められています．1つは，ネットワークに接続されているすべてのサーバが知っている分散チャネルです．これらのチャネルは，最初の文字が，そのチャネルが存在するサーバ上のクライアントのみが参加できることでマークされています．これらのチャネルは，先頭の ’&’ 文字で区別されます．この2つのタイプの他に，個々のチャネルの特性を変更するために，様々なチャネルモードがあります．これについての詳細は [4.2.3 (MODE コマンド)](#423-mode-message) を参照してください．
 
 新しいチャネルを作成したり，既存のチャネルの一部になるには，ユーザはチャネルに参加する必要があります．参加する前にチャネルが存在しない場合，チャネルは作成され，作成ユーザはチャネルオペレータになります．チャネルが既に存在する場合，そのチャネルへの JOIN 要求が受け入れられるかどうかは，チャネルの現在のモードによって異なります．たとえば，チャネルが招待制 (+i) の場合，あなたは招待された場合のみ参加できます．プロトコルの一部として，ユーザーは同時に複数のチャネルに参加することができますが，経験豊富なユーザーと初心者ユーザーの両方にとって十分であるとして，10チャネルに制限することが推奨されています．これについては，[8.13 Channel membership](#813-channel-membership)を参照してください．
 
-2つのサーバ間の分割によりIRCネットワークが分断された場合，それぞれの側のチャネルは，分割されたそれぞれの側のサーバに接続されているクライアントのみで構成され，分割された一方の側で存在しなくなる可能性があります．分割が完了すると，接続サーバーはそれぞれのチャネルにいると思われる人とそのチャネルのモードを互いに発表します．チャネルが両側に存在する場合，JOIN と MODE は包括的に解釈され，新しい接続の両側が，どのクライアントがチャネルにいるか，チャネルがどのようなモードを持っているかについて合意するようにします．
+2つのサーバ間の分割によりIRCネットワークが分断された場合，それぞれの側のチャネルは，分割されたそれぞれの側のサーバに接続されているクライアントのみで構成され，分割された一方の側で存在しなくなる可能性があります．分割が完了すると，接続サーバはそれぞれのチャネルにいると思われる人とそのチャネルのモードを互いに発表します．チャネルが両側に存在する場合，JOIN と MODE は包括的に解釈され，新しい接続の両側が，どのクライアントがチャネルにいるか，チャネルがどのようなモードを持っているかについて合意するようにします．
 
 #### 1.3.1 Channel Operators
 あるチャネルのチャネル・オペレータ（「チョップ」または「チャノップ」とも呼ばれる）は，そのチャネルを「所有」しているとみなされます．このステータスを認識し，チャネル・オペレータは自分のチャネルをコントロールし，ある種の健全性を保つことができる一定の権限を与えられています． しかし，彼らの行動が一般的に反社会的であったり，虐待的である場合，IRCオペレータに介入を依頼したり，ユーザーが他のチャネルに移動して，自分たちのチャネルを形成することは妥当なことかもしれません．
@@ -191,54 +191,52 @@ IRCネットワーク内の秩序を保つために，特別なクライアン�
 
 ## 2. The IRC Specification
 ### 2.1 Overview
-The protocol as described herein is for use both with server to server and client to server connections. There are, however, more restrictions on client connections (which are considered to be untrustworthy) than on server connections.
+本書で説明するプロトコルは，サーバ間接続とクライアントからサーバへの接続の両方に使用することができます．ただし，クライアント接続（信用できないとされる）には，サーバ接続よりも多くの制約があります．
 
 ### 2.2 Character codes
-No specific character set is specified. The protocol is based on a a set of codes which are composed of eight (8) bits, making up an octet. Each message may be composed of any number of these octets; however, some octet values are used for control codes which act as message delimiters.
+特定の文字セットは指定しません．プロトコルは，8 ビットで構成されるオクテットという符号体系を基本としています．各メッセージはこのオクテットの数で構成されますが，一部のオクテット値はメッセージの区切りとなる制御コードに使用されます．
 
-Regardless of being an 8-bit protocol, the delimiters and keywords are such that protocol is mostly usable from USASCII terminal and a telnet connection.
+8ビットプロトコルであるにもかかわらず，デリミタとキーワードがあるため，USASCIIターミナルとtelnet接続でほとんど使用可能です．
 
-Because of IRC’s scandanavian origin, the characters {}| are considered to be the lower case equivalents of the characters [], respectively. This is a critical issue when determining the equivalence of two nicknames.
+IRCはスカンジナビア語が起源なので，{}|という文字はそれぞれ[]という文字に相当する小文字とみなされます．これは，2つのニックネームの等価性を判断する際に重要な問題です．
 
 ### 2.3 Messages
-Servers and clients send eachother messages which may or may not generate a reply. If the message contains a valid command, as described in later sections, the client should expect a reply as specified but it is not advised to wait forever for the reply; client to server and server to server communication is essentially asynchronous in nature.
+サーバとクライアントは互いにメッセージを送り合い，返信が発生することもあればしないこともあります．メッセージに有効なコマンドが含まれている場合，後のセクションで説明するように，クライアントは指定されたとおりの返信を期待すべきですが，返信を永遠に待つことはお勧めできません．クライアントからサーバ，サーバからサーバへの通信は，本質的に非同期的な性質を持っています．
 
-Each IRC message may consist of up to three main parts: the prefix (optional), the command, and the command parameters (of which there may be up to 15). The prefix, command, and all parameters are separated by one (or more) ASCII space character(s) (0x20).
+各IRCメッセージは，プレフィックス（オプション），コマンド，コマンド・パラメータ（最大15個まで）の3つの主要部分から構成されます．プレフィックス，コマンド，およびすべてのパラメータは，1つ（または複数）のASCIIスペース文字（0x20）で区切られます．
 
-The presence of a prefix is indicated with a single leading ASCII colon character (’:’, 0x3b), which must be the first character of the message itself. There must be no gap (whitespace) between the colon and the prefix. The prefix is used by servers to indicate the true
+プリフィックスの存在は，先頭のASCIIコロン文字（’:’，0x3b）1つで示され，これはメッセージ自体の最初の文字でなければなりません．コロンとプレフィックスの間に隙間（ホワイトスペース）があってはいけません．プレフィックスは，サーバがメッセージの本当の出所を示すために使われます．メッセージにプレフィックスがない場合，そのメッセージは受信した接続から発信されたものとみなされます．クライアントは自分自身からメッセージを送るときには prefix を使うべきではありません． もし prefix を使うなら，有効な prefix はそのクライアントに関連付けられた登録済みの ニックネームだけです．プレフィックスによって識別される送信元がサーバの内部データベースから見つからない場合，あるいは送信元がメッセージの到着元とは異なるリンクから登録されている場合，サーバはそのメッセージを黙って無視しなければなりません．
 
-origin of the message. If the prefix is missing from the message, it is assumed to have originated from the connection from which it was received. Clients should not use prefix when sending a message from themselves; if they use a prefix, the only valid prefix is the registered nickname associated with the client. If the source identified by the prefix cannot be found from the server’s internal database, or if the source is registered from a different link than from which the message arrived, the server must ignore the message silently.
+コマンドは，有効なIRCコマンドか，ASCIIテキストで表現された(3)桁の数字でなければなりません．
 
-The command must either be a valid IRC command or a three (3) digit number represented in ASCII text.
-
-IRC messages are always lines of characters terminated with a CR-LF (Carriage Return - Line Feed) pair, and these messages shall not exceed 512 characters in length, counting all characters including the trailing CR-LF. Thus, there are 510 characters maximum allowed for the command and its parameters. There is no provision for continuation message lines. See section 7 for more details about current implementations.
+IRCメッセージは常にCR-LF（Carriage Return - Line Feed）ペアで終了する文字列であり，メッセージの長さは最後のCR-LFを含むすべての文字を含めて512文字以下でなければなりません．したがって，コマンドとそのパラメータに許容される文字数は最大510文字です．継続メッセージ行の規定はありません．現在の実装の詳細については，[7. Client and server authentication](#7-client-and-server-authentication)を参照してください．
 
 #### 2.3.1 Message format in ’pseudo’ BNF
-The protocol messages must be extracted from the contiguous stream of octets. The current solution is to designate two characters, CR and LF, as message separators. Empty messages are silently ignored, which permits use of the sequence CR-LF between messages without extra problems.
+プロトコルメッセージは，オクテットの連続したストリームから抽出されなければなりません．現在の解決策は，CRとLFという2つの文字をメッセージのセパレータとして指定することです．空のメッセージは黙って無視されるので，メッセージ間でCR-LFのシーケンスが余分な問題なく使用できるようになります．
 
-The extracted message is parsed into the components \<prefix\>, \<command\> and list of parameters matched either by \<middle\> or \<trailing\> components.
+抽出されたメッセージは，\<prefix\>，\<command\> という要素と，\<middle\> または \<trailing\> のどちらかの要素でマッチするパラメータのリストに解析されます．
 
-The BNF representation for this is:
+これをBNFで表現すると
 ```
 <message>  ::= [’:’ <prefix> <SPACE> ] <command> <params> <crlf>
 <prefix>   ::= <servername> | <nick> [ ’!’ <user> ] [ ’@’ <host> ]
 <command>  ::= <letter> { <letter> } | <number> <number> <number>
 <SPACE>    ::= ’ ’ { ’ ’ }
 <params>   ::= <SPACE> [ ’:’ <trailing> | <middle> <params> ]
-<middle>   ::= <Any *non-empty* sequence of octets not including SPACE or NUL or CR or LF, the first of which may not be ’:’>
-<trailing> ::= <Any, possibly *empty*, sequence of octets not including NUL or CR or LF>
+<middle>   ::= <SPACE，NUL，CR，LFを含まない，*空でない*オクテットのシーケンス． その最初の文字が’:’であってはならない．>
+<trailing> ::= <NUL，CR，LF を含まない，任意の（場合によっては*空白の*）オクテット列>
 <crlf>     ::= CR LF
 ```
 
 NOTES:
- 1) \<SPACE\> is consists only of SPACE character(s) (0x20).  Specially notice that TABULATION, and all other control characters are considered NON-WHITE-SPACE.
- 2) After extracting the parameter list, all parameters are equal, whether matched by \<middle\> or \<trailing\>. \<Trailing\> is just a syntactic trick to allow SPACE within parameter.
- 3) The fact that CR and LF cannot appear in parameter strings is just artifact of the message framing. This might change later.
- 4) The NUL character is not special in message framing, and basically could end up inside a parameter, but as it would cause extra complexities in normal C string handling. Therefore NUL is not allowed within messages.
- 5) The last parameter may be an empty string.
- 6) Use of the extended prefix ([’!’ \<user\> ] [’@’ \<host\> ]) must not be used in server to server communications and is only intended for server to client messages in order to provide clients with more useful information about who a message is from without the need for additional queries.
+1) \<SPACE\>は，スペース文字(0x20)のみで構成されます．特に，TABULATION と他のすべての制御文字は非空白文字とみなされます．
+2) パラメータリスト抽出後，\<middle\>でマッチングしても\<trailing\>でマッチングしても，すべてのパラメータは等しくなります．\<trailing\>は，パラメータ内の SPACE を許容するための構文上のトリックに過ぎません．
+3) パラメータ文字列にCRとLFが出現しないのは，メッセージのフレームワークのせいです．これは後で変更されるかもしれません．
+4) NUL文字はメッセージのフレーム化において特別なものではなく，基本的にはパラメータの内部で終わる可能性がありますが，通常のCの文字列処理において余分な複雑さを引き起こすため，この文字は使用できません．したがって，NULはメッセージの中では許されません．
+5) 最後のパラメータには，空文字列を指定することができます．
+6) 拡張プレフィックス（[’!’ \<user\> ] [’@’ \<host\> ]）の使用は，サーバ間通信では使用してはならず，サーバからクライアントへのメッセージに限り，追加の問い合わせを必要とせずにメッセージの送信元に関するより有用な情報をクライアントに提供するために意図されています．
 
-Most protocol messages specify additional semantics and syntax for the extracted parameter strings dictated by their position in the list. For example, many server commands will assume that the first parameter after the command is the list of targets, which can be described with:
+ほとんどのプロトコルメッセージは，リスト内の位置によって，抽出されたパラメータ文字列の追加のセマンティクスとシンタックスを指定しています．例えば，多くのサーバコマンドは，コマンドの後の最初のパラメータがターゲットのリストであると仮定し，これを記述することができます．
 ```
 <target>     ::= <to> [ "," <target> ]
 <to>         ::= <channel> | <user> ’@’ <servername> | <nick> | <mask>
@@ -249,7 +247,7 @@ Most protocol messages specify additional semantics and syntax for the extracted
 <mask>       ::= (’#’ | ’$’) <chstring>
 <chstring>   ::= <any 8bit code except SPACE, BELL, NUL, CR, LF and comma (’,’)>
 ```
-Other parameter syntaxes are:
+その他のパラメータ構文は以下の通りです．
 ```
 <user>     ::= <nonwhite> { <nonwhite> }
 <letter>   ::= ’a’ ... ’z’ | ’A’ ... ’Z’
@@ -259,7 +257,7 @@ Other parameter syntaxes are:
 ```
 
 ### 2.4 Numeric replies
-Most of the messages sent to the server generate a reply of some sort. The most common reply is the numeric reply, used for both errors and normal replies. The numeric reply must be sent as one message consisting of the sender prefix, the three digit numeric, and the target of the reply. A numeric reply is not allowed to originate from a client; any such messages received by a server are silently dropped. In all other respects, a numeric reply is just like a normal message, except that the keyword is made up of 3 numeric digits rather than a string of letters. A list of different replies is supplied in section 6.
+サーバに送信されたメッセージのほとんどは，何らかの応答を生成します．最も一般的な返信は数値による返信で，エラーと正常な返信の両方に使用されます．数値による返信は，送信者プレフィックス，3桁の数値，リプライのターゲットからなる1つのメッセージとして送信する必要があります．数値による応答は，クライアントから発信することはできないので，サーバが受信したそのようなメッセージは静かに削除されます．キーワードが文字列ではなく3桁の数字で構成されていることを除けば，他のすべての点で，数値による返信は通常のメッセージと同じである．さまざまな返信のリストは6章に記載されています．
 
 ## 3. IRC Concepts.
 This section is devoted to describing the actual concepts behind the organization of the IRC protocol and how the current implementations deliver different classes of messages.
