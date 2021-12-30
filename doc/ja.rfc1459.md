@@ -331,24 +331,24 @@ IRCの運営者が，関連する多くのユーザーにメッセージを送�
 サーバ間のほとんどのメッセージは，すべての’他の’サーバに配布されますが，これは，ユーザー，チャネル，サーバのいずれかに影響を与えるメッセージにのみ必要です．これらは IRC で見られる基本的な項目ですので，あるサーバから発信されたほぼすべてのメッセージは，接続されている他のすべてのサーバにブロードキャストされます．
 
 ## 4. MESSAGE DETAILS
-On the following pages are descriptions of each message recognized by the IRC server and client. All commands described in this section must be implemented by any server for this protocol.
+以下のページでは、IRCサーバーとクライアントが認識する各メッセージについて説明します。このセクションで説明されているすべてのコマンドは、このプロトコルのための任意のサーバーで実装されている必要があります。
 
-Where the reply ERR_NOSUCHSERVER is listed, it means that the parameter could not be found. The server must not send any other replies after this for that command.
+ERR_NOSUCHSERVER が記載されている場合、パラメータが見つからなかったことを意味します。サーバーはこれ以降、そのコマンドに対して他の応答を送ってはなりません．
 
-The server to which a client is connected is required to parse the complete message, returning any appropriate errors. If the server encounters a fatal error while parsing a message, an error must be sent back to the client and the parsing terminated. A fatal error may be considered to be incorrect command, a destination which is otherwise unknown to the server (server, nick or channel names fit this category), not enough parameters or incorrect privileges.
+クライアントが接続されているサーバーは、メッセージ全体を解析し、適切なエラーを返すことが要求されます。メッセージの解析中に致命的なエラーが発生した場合、クライアントにエラーを返し、解析は終了しなければなりません。致命的なエラーとは、不正なコマンド、サーバにとって未知の宛先(サーバ名、ニックネーム、チャネル名がこれに該当)、十分なパラメータがない、不正な権限などが考えられます。
 
-If a full set of parameters is presented, then each must be checked for validity and appropriate responses sent back to the client. In the case of messages which use parameter lists using the comma as an item separator, a reply must be sent for each item.
+パラメータの完全なセットが提示された場合、それぞれの有効性をチェックし、適切なレスポンスをクライアントに返さなければなりません。コンマを区切り文字としてパラメータリストを使用するメッセージの場合、各項目に対して応答を送信しなければなりません。
 
-In the examples below, some messages appear using the full format:
+以下の例では、一部のメッセージはフルフォーマットで表示されます。
 
 :Name COMMAND parameter list
 
-Such examples represent a message from "Name" in transit between servers, where it is essential to include the name of the original sender of the message so remote servers may send back a reply along the correct path.
+このような例は、サーバー間で転送中の「名前」からのメッセージを表し、リモートサーバーが正しい経路で返信できるように、メッセージの元の送信者の名前を含めることが重要です。
 
 ### 4.1 Connection Registration
-The commands described here are used to register a connection with an IRC server as either a user or a server as well as correctly disconnect.
+ここで説明するコマンドは、IRCサーバーにユーザーまたはサーバーとして接続を登録し、正しく切断するために使用されます。
 
-A "PASS" command is not required for either client or server connection to be registered, but it must precede the server message or the latter of the NICK/USER combination. It is strongly recommended that all server connections have a password in order to give some level of security to the actual connections. The recommended order for a client to register is as follows:
+"PASS" コマンドは、クライアント接続、サーバー接続のいずれにおいても登録する必要はありませんが、サーバーメッセージまたはNICK/USERの組み合わせの後者に先行させる必要があります。実際の接続にある程度のセキュリティを与えるために、すべてのサーバー接続にパスワードを設定することを強くお勧めします。クライアントが登録する際の推奨順序は以下の通りです。
 
 1. Pass message
 2. Nick message
@@ -359,7 +359,7 @@ A "PASS" command is not required for either client or server connection to be re
 Command   :  PASS
 Parameters:  <password>
 ```
-The PASS command is used to set a ’connection password’. The password can and must be set before any attempt to register the connection is made. Currently this requires that clients send a PASS command before sending the NICK/USER combination and servers *must* send a PASS command before any SERVER command. The password supplied must match the one contained in the C/N lines (for servers) or I lines (for clients). It is possible to send multiple PASS commands before registering but only the last one sent is used for verification and it may not be changed once registered.
+PASSコマンドは、’接続パスワード’を設定するために使用します。パスワードは、接続を登録しようとする前に設定することができ、また設定しなければなりません。現在、クライアントはNICK/USERの組み合わせを送信する前にPASSコマンドを送信する必要があり、サーバーはSERVERコマンドの前にPASSコマンドを送信する必要があります。提供されるパスワードは、C/Nライン（サーバー用）またはIライン（クライアント用）に含まれるものと一致しなければなりません。登録前に複数のPASSコマンドを送信することは可能ですが、最後に送信されたものだけが検証に使用され、一度登録すると変更することはできません。
 
 Numeric Replies:
 ```
@@ -377,11 +377,11 @@ Example:
 Parameters:  <nickname> [ <hopcount> ]
 ```
 
-NICK message is used to give user a nickname or change the previous one. The parameter is only used by servers to indicate how far away a nick is from its home server. A local connection has a hopcount of 0. If supplied by a client, it must be ignored.
+NICKメッセージは、ユーザーにニックネームを与えたり、以前のニックネームを変更するために使用されます。このパラメータは、ニックネームがホームサーバからどれくらい離れているかを示すために、サーバによってのみ使用されます。ローカル接続の場合、hopcountは 0 になります。クライアントから提供された場合、これは無視されなければなりません。
 
-If a NICK message arrives at a server which already knows about an identical nickname for another client, a nickname collision occurs.  As a result of a nickname collision, all instances of the nickname are removed from the server’s database, and a KILL command is issued to remove the nickname from all other server’s database. If the NICK message causing the collision was a nickname change, then the original (old) nick must be removed as well.
+他のクライアントの同じニックネームを既に知っているサーバにNICKメッセージが到着した場合、ニックネームの衝突が発生します。 ニックネームの衝突の結果、そのニックネームのすべてのインスタンスがサーバのデータベースから削除され、KILL コマンドが他のすべてのサーバのデータベースからそのニックネームを削除するために発行されます。衝突の原因となった NICK メッセージがニックネームの変更であった場合、元の（古い）ニックネームも同様に削除されなければなりません。
 
-If the server recieves an identical NICK from a client which is directly connected, it may issue an ERR_NICKCOLLISION to the local client, drop the NICK command, and not generate any kills.
+サーバーが直接接続されているクライアントから同一のNICKを受信した場合、ローカルクライアントにERR_NICKCOLLISIONを発行してNICKコマンドを破棄し、killを生成しないようにすることができます。
 
 Numeric Replies:
 ```
@@ -391,8 +391,8 @@ Numeric Replies:
 
 Example:
 ```
-NICK Wiz           ; Introducing new nick "Wiz".
-:WiZ NICK Kilroy   ; WiZ changed his nickname to Kilroy.
+NICK Wiz           ; 新しいニックネーム "Wiz "を紹介します。
+:WiZ NICK Kilroy   ; WiZがKilroyにニックネームを変更しました。
 ```
 
 #### 4.1.3 User message
@@ -401,13 +401,13 @@ Command   :  USER
 Parameters:  <username> <hostname> <servername> <realname>
 ```
 
-The USER message is used at the beginning of connection to specify the username, hostname, servername and realname of s new user. It is also used in communication between servers to indicate new user arriving on IRC, since only after both USER and NICK have been received from a client does a user become registered.
+USER メッセージは、接続の最初に新しいユーザのユーザ名、ホスト名、サーバ名、実名 を指定するために使用されます。また、サーバ間の通信でも、新しいユーザがIRCに到着したことを示すために使われます。なぜなら、クライアントからUSERとNICKの両方を受け取って初めて、ユーザが登録されるからです。
 
-Between servers USER must to be prefixed with client’s NICKname.  Note that hostname and servername are normally ignored by the IRC server when the USER command comes from a directly connected client (for security reasons), but they are used in server to server communication. This means that a NICK must always be sent to a remote server when a new user is being introduced to the rest of the network before the accompanying USER is sent.
+サーバー間では、USERの前にクライアントのNICKnameを付ける必要があります。 ホスト名とサーバー名は、通常、IRCサーバーが直接接続されたクライアントからUSERコマンドが来た場合には(セキュリティ上の理由から)無視されますが、サーバー間の通信では使用されることに注意してください。つまり、新しいユーザーをネットワークの他の部分に紹介するときには、必ずNICKをリモートサーバーに送信してから、付随するUSERを送信しなければなりません。
 
-It must be noted that realname parameter must be the last parameter, because it may contain space characters and must be prefixed with a colon (’:’) to make sure this is recognised as such.
+realnameパラメータは、スペース文字を含む可能性があるため、最後のパラメータとする必要があり、そのように認識されるようにコロン（’:’）を先頭に付ける必要があることに注意しなければなりません。
 
-Since it is easy for a client to lie about its username by relying solely on the USER message, the use of an "Identity Server" is recommended. If the host which a user connects from has such a server enabled the username is set to that as in the reply from the "Identity Server".
+USERメッセージのみに依存すると、クライアントがユーザー名について簡単に嘘をつ くことができるため、「IDサーバー」の使用を推奨します。ユーザーが接続するホストでこのようなサーバーが有効になっている場合、ユーザー名は「IDサーバー」からの返信と同じように設定されます。
 
 Numeric Replies:
 ```
@@ -417,10 +417,10 @@ Numeric Replies:
 Examples:
 ```
 USER guest tolmoon tolsun :Ronnie Reagan
-                   ; User registering themselves with a username of "guest" and real name "Ronnie Reagan".
+                   ; ユーザー名「guest」、本名「Ronnie Reagan」で登録されたユーザー
 
 :testnick USER guest tolmoon tolsun :Ronnie Reagan
-                   ; message between servers with the nickname for which the USER command belongs to
+                   ; USERコマンドが属するニックネームで、サーバー間でメッセージをやり取りします
 ```
 
 #### 4.1.4 Server message
@@ -429,13 +429,13 @@ USER guest tolmoon tolsun :Ronnie Reagan
 Parameters:  <user> <password>
 ```
 
-The server message is used to tell a server that the other end of a new connection is a server. This message is also used to pass server data over whole net. When a new server is connected to net, information about it be broadcast to the whole network. \<hopcount\> is used to give all servers some internal information on how far away all servers are. With a full server list, it would be possible to construct a map of the entire server tree, but hostmasks prevent this from being done.
+サーバーメッセージは、新しい接続の相手側がサーバーであることをサーバーに伝えるために使用されます。このメッセージは、サーバーのデータをネット全体に渡すためにも使われます。新しいサーバがネットに接続されると、そのサーバに関する情報はネットワーク全体にブロードキャストされます。\<hopcount\> は、すべてのサーバがどの程度離れているかという内部情報を与えるために使用されます。完全なサーバーリストがあれば、サーバーツリー全体のマップを作成することが可能ですが、ホストマスクがそれを阻んでいます。
 
-The SERVER message must only be accepted from either (a) a connection which is yet to be registered and is attempting to register as a server, or (b) an existing connection to another server, in which case the SERVER message is introducing a new server behind that server.
+SERVERメッセージは、(a)まだ登録されておらず、サーバとして登録しようとしている接続、または(b)他のサーバへの既存の接続、この場合、SERVERメッセージはそのサーバの後ろに新しいサーバを導入している、のいずれかからのみ受け入れられなければなりません。
 
-Most errors that occur with the receipt of a SERVER command result in the connection being terminated by the destination host (target SERVER). Error replies are usually sent using the "ERROR" command rather than the numeric since the ERROR command has several useful properties which make it useful here.
+SERVERコマンドを受信したときに発生するエラーのほとんどは、宛先ホスト（ターゲットSERVER）によって接続が切断されることになります。ERRORコマンドにはいくつかの有用な特性があるため、エラー返信は通常、数値コマンドではなく、"ERROR "コマンドを使用して送信されます。
 
-If a SERVER message is parsed and attempts to introduce a server which is already known to the receiving server, the connection from which that message must be closed (following the correct procedures), since a duplicate route to a server has formed and the acyclic nature of the IRC tree broken.
+SERVERメッセージが解析され、受信側のサーバにすでに知られているサーバを紹介しようとした場合、サーバへの重複したルートが形成され、IRCツリーの非周期性が壊れているため、そのメッセージからの接続は(正しい手順に従って)閉じられなければなりません。
 
 Numeric Replies:
 ```
@@ -445,10 +445,10 @@ Numeric Replies:
 Example:
 ```
 SERVER test.oulu.fi 1 :[tolsun.oulu.fi] Experimental server
-        ; New server test.oulu.fi introducing itself and attempting to register. The name in []’s is the hostname for the host running test.oulu.fi.
+        ; 新しいサーバー test.oulu.fi が自己紹介し、登録を試みています。[]内の名前は、test.oulu.fiを実行しているホストのホスト名です。
 
 :tolsun.oulu.fi SERVER csd.bu.edu 5 :BU Central Server
-        ; Server tolsun.oulu.fi is our uplink for csd.bu.edu which is 5 hops away.
+        ; サーバー tolsun.oulu.fi は、5ホップ離れた csd.bu.edu へのアップリンクです。
 ```
 
 #### 4.1.5 Oper
@@ -457,11 +457,11 @@ SERVER test.oulu.fi 1 :[tolsun.oulu.fi] Experimental server
 Parameters:  <user> <password>
 ```
 
-OPER message is used by a normal user to obtain operator privileges.  The combination of \<user\> and \<password\> are required to gain Operator privileges.
+OPER メッセージは、一般ユーザがオペレータ権限を取得するために使用します。Operator権限を取得するためには，\<user\>と\<password\>の組み合わせが必要です。
 
-If the client sending the OPER command supplies the correct password for the given user, the server then informs the rest of the network of the new operator by issuing a "MODE +o" for the clients nickname.
+OPERコマンドを送信したクライアントが、指定されたユーザーの正しいパスワードを提供した場合、サーバーはクライアントのニックネームに対して"MODE +o"を発行して、新しいオペレーターをネットワークの残りの部分に通知します。
 
-The OPER message is client-server only.
+OPERメッセージは、クライアント・サーバーのみです。
 
 Numeric Replies:
 ```
@@ -471,7 +471,7 @@ Numeric Replies:
 
 Example:
 ```
-OPER foo bar       ; Attempt to register as an operator using a username of "foo" and "bar" as the password.
+OPER foo bar       ; ユーザー名に "foo"、パスワードに "bar "を使ってオペレータ登録を試みます。
 ```
 
 #### 4.1.6 Quit message
@@ -480,11 +480,11 @@ OPER foo bar       ; Attempt to register as an operator using a username of "foo
 Parameters:  [<Quit message>]
 ```
 
-A client session is ended with a quit message. The server must close the connection to a client which sends a QUIT message. If a "Quit Message" is given, this will be sent instead of the default message, the nickname.
+クライアントのセッションは、終了メッセージで終了します。サーバは、QUITメッセージを送信したクライアントとの接続を終了しなければなりません。"Quit Message" が指定された場合、デフォルトのメッセージである nickname の代わりにこれが送られます。
 
-When netsplits (disconnecting of two servers) occur, the quit message is composed of the names of two servers involved, separated by a space. The first name is that of the server which is still connected and the second name is that of the server that has become disconnected.
+ネットスプリット（2つのサーバーの接続が切れること）が発生した場合、終了メッセージは関係する2つのサーバーの名前をスペースで区切って構成されます。最初の名前は、まだ接続しているサーバーの名前であり、2番目の名前は、切断されたサーバーの名前です。
 
-If, for some other reason, a client connection is closed without the client issuing a QUIT command (e.g. client dies and EOF occurs on socket), the server is required to fill in the quit message with some sort of message reflecting the nature of the event which caused it to happen.
+その他の理由で、クライアントがQUITコマンドを発行せずにクライアント接続を閉じた場合（例：クライアントが死亡し、ソケットでEOFが発生）、サーバは、その原因となった事象の性質を反映した何らかのメッセージで、終了メッセージを埋める必要があります。
 
 Numeric Replies:
 ```
@@ -493,7 +493,7 @@ Numeric Replies:
 
 Examples:
 ```
-QUIT :Gone to have lunch   ; Preferred message format.
+QUIT :Gone to have lunch   ; 望ましいメッセージの形式
 ```
 
 #### 4.1.7 Server Quit message
@@ -502,17 +502,17 @@ QUIT :Gone to have lunch   ; Preferred message format.
 Parameters:  <server> <comment>
 ```
 
-The SQUIT message is needed to tell about quitting or dead servers.  If a server wishes to break the connection to another server it must send a SQUIT message to the other server, using the the name of the other server as the server parameter, which then closes its connection to the quitting server.
+SQUITメッセージは、終了したサーバーや死んだサーバーを伝えるために必要です。 あるサーバが他のサーバとの接続を切断したい場合、SQUIT メッセージを他のサーバに送信する必要があります。その際、サーバパラメータとして他のサーバ名を指定します。
 
-This command is also available operators to help keep a network of IRC servers connected in an orderly fashion. Operators may also issue an SQUIT message for a remote server connection. In this case, the SQUIT must be parsed by each server inbetween the operator and the remote server, updating the view of the network held by each server as explained below.
+このコマンドは、IRCサーバーのネットワークを秩序正しく接続するために、オペレーターも利用できます。オペレータは、リモートサーバ接続のために SQUIT メッセージを発行することもできます。この場合、SQUITはオペレータとリモートサーバの間にある各サーバによって解析されなければならず、以下に説明するように各サーバによって保持されるネットワークのビューが更新されます。
 
-The \<comment\> should be supplied by all operators who execute a SQUIT for a remote server (that is not connected to the server they are currently on) so that other operators are aware for the reason of this action. The \<comment\> is also filled in by servers which may place an error or similar message here.
+\<comment\>は、（現在接続していない）リモートサーバに対してSQUITを実行するすべてのオペレータが、このアクションの理由を他のオペレータに認識させるために提供されるべきです。\<comment\> はまた、エラーまたは同様のメッセージを表示するサーバによって記入されます。
 
-Both of the servers which are on either side of the connection being closed are required to to send out a SQUIT message (to all its other server connections) for all other servers which are considered to be behind that link.
+コネクションを閉じた側の両サーバーは、そのリンクの背後にあると考えられる他のすべてのサーバーのコネクションに対してSQUITメッセージを送信することが要求されます。
 
-Similarly, a QUIT message must be sent to the other connected servers rest of the network on behalf of all clients behind that link. In addition to this, all channel members of a channel which lost a member due to the split must be sent a QUIT message.
+同様に、QUITメッセージは、そのリンクの背後にあるすべてのクライアントに代わって、ネットワークの他の接続されたサーバーの残りの部分に送信されなければなりません。これに加えて、分割によってメンバーを失ったチャネルの全メンバーにQUITメッセージを送信しなければなりません。
 
-If a server connection is terminated prematurely (e.g. the server on the other end of the link died), the server which detects this disconnection is required to inform the rest of the network that the connection has closed and fill in the comment field with something appropriate.
+サーバー接続が早期に切断された場合（リンクの反対側のサーバーが死んだなど）、この切断を検出したサーバーは、ネットワークの残りの部分に接続が終了したことを通知し、コメントフィールドに適切な内容を記入する必要があります。
 
 Numeric replies:
 ```
@@ -521,10 +521,11 @@ Numeric replies:
 
 Example:
 ```
-SQUIT tolsun.oulu.fi :Bad Link?  ; the server link tolson.oulu.fi has been terminated because of "Bad Link".
+SQUIT tolsun.oulu.fi :Bad Link?
+        ; サーバーのリンク tolson.oulu.fi は "Bad Link" のため終了されました。
 
 :Trillian SQUIT cm22.eng.umd.edu :Server out of control
-                                 ; message from Trillian to disconnect "cm22.eng.umd.edu" from the net because "Server out of control".
+        ; Trillianから、"Server out of control "のため、"cm22.eng.umd.edu "をネットから切断するようにとのメッセージが表示されました。
 ```
 
 ### 4.2 Channel operations
