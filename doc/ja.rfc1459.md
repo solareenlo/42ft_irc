@@ -209,7 +209,7 @@ IRCはスカンジナビア語が起源なので，{}|という文字はそれ�
 
 コマンドは，有効なIRCコマンドか，ASCIIテキストで表現された(3)桁の数字でなければなりません．
 
-IRCメッセージは常にCR-LF（Carriage Return - Line Feed）ペアで終了する文字列であり，メッセージの長さは最後のCR-LFを含むすべての文字を含めて512文字以下でなければなりません．したがって，コマンドとそのパラメータに許容される文字数は最大510文字です．継続メッセージ行の規定はありません．現在の実装の詳細については，[7. Client and server authentication](#7-client-and-server-authentication)を参照してください．
+IRCメッセージは常にCR-LF（Carriage Return - Line Feed）ペアで終了する文字列であり，メッセージの長さは最後のCR-LFを含むすべての文字を含めて512文字以下でなければなりません．したがって，コマンドとそのパラメータに許容される文字数は最大510文字です．継続メッセージ行の規定はありません．現在の実装の詳細については，章[7. Client and server authentication](#7-client-and-server-authentication)を参照してください．
 
 #### 2.3.1 Message format in ’pseudo’ BNF
 プロトコルメッセージは，オクテットの連続したストリームから抽出されなければなりません．現在の解決策は，CRとLFという2つの文字をメッセージのセパレータとして指定することです．空のメッセージは黙って無視されるので，メッセージ間でCR-LFのシーケンスが余分な問題なく使用できるようになります．
@@ -257,10 +257,10 @@ NOTES:
 ```
 
 ### 2.4 Numeric replies
-サーバに送信されたメッセージのほとんどは，何らかの応答を生成します．最も一般的な返信は数値による返信で，エラーと正常な返信の両方に使用されます．数値による返信は，送信者プレフィックス，3桁の数値，リプライのターゲットからなる1つのメッセージとして送信する必要があります．数値による応答は，クライアントから発信することはできないので，サーバが受信したそのようなメッセージは静かに削除されます．キーワードが文字列ではなく3桁の数字で構成されていることを除けば，他のすべての点で，数値による返信は通常のメッセージと同じである．さまざまな返信のリストは6章に記載されています．
+サーバに送信されたメッセージのほとんどは，何らかの応答を生成します．最も一般的な返信は数値による返信で，エラーと正常な返信の両方に使用されます．数値による返信は，送信者プレフィックス，3桁の数値，リプライのターゲットからなる1つのメッセージとして送信する必要があります．数値による応答は，クライアントから発信することはできないので，サーバが受信したそのようなメッセージは静かに削除されます．キーワードが文字列ではなく3桁の数字で構成されていることを除けば，他のすべての点で，数値による返信は通常のメッセージと同じである．さまざまな返信のリストは章[6. REPLIES](#6-replies)に記載されています．
 
 ## 3. IRC Concepts.
-This section is devoted to describing the actual concepts behind the organization of the IRC protocol and how the current implementations deliver different classes of messages.
+このセクションでは，IRCプロトコルの構成の背後にある実際の概念と，現在の実装がどのようにメッセージの異なるクラスを提供するかを説明することに専念します．
 
 ```
     1--\
@@ -274,63 +274,61 @@ This section is devoted to describing the actual concepts behind the organizatio
 ```
 
 ### 3.1 One-to-one communication
-Communication on a one-to-one basis is usually only performed by clients, since most server-server traffic is not a result of servers talking only to each other. To provide a secure means for clients to talk to each other, it is required that all servers be able to send a message in exactly one direction along the spanning tree in order to reach any client. The path of a message being delivered is the shortest path between any two points on the spanning tree.
+サーバとサーバのトラフィックのほとんどは，サーバ同士が会話しているわけではないため，1対1の通信は通常クライアントのみが行います．クライアントが互いに会話するための安全な手段を提供するためには，すべてのサーバが，任意のクライアントに到達するために，スパニングツリーに沿って正確に一方向にメッセージを送信できることが必要です．メッセージが配送される経路は，スパニングツリー上の任意の2点間の最短経路です．
 
-The following examples all refer to Figure 2 above.
+以下の例は，すべて上記の図2を参照しています．
 
 * Example 1:
 
-    A message between clients 1 and 2 is only seen by server A, which sends it straight to client 2.
+    クライアント1とクライアント2間のメッセージは，サーバAだけが見ることができ，サーバAはメッセージをそのままクライアント2に送ります．
 
 * Example 2:
 
-    A message between clients 1 and 3 is seen by servers A & B, and client 3. No other clients or servers are allowed see the message.
+    クライアント1とクライアント3間のメッセージは，サーバAとB，クライアント3が見ることができます．他のクライアントやサーバはメッセージを見ることができません．
 
 * Example 3:
 
-    A message between clients 2 and 4 is seen by servers A, B, C & D and client 4 only.
+    クライアント2と4の間のメッセージは，サーバA，B，C，Dとクライアント4だけが見ることができます．
 
 ### 3.2 One-to-many
-The main goal of IRC is to provide a forum which allows easy and efficient conferencing (one to many conversations). IRC offers several means to achieve this, each serving its own purpose.
+IRCの主な目的は，簡単かつ効率的にコンファレンス（1対多の会話）を行うことができるフォーラムを提供することです．IRCはこれを実現するためにいくつかの手段を提供しており，それぞれが独自の目的をもっています．
 
 #### 3.2.1 To a list
-The least efficient style of one-to-many conversation is through clients talking to a ’list’ of users. How this is done is almost self explanatory: the client gives a list of destinations to which the message is to be delivered and the server breaks it up and dispatches a separate copy of the message to each given destination.  This isn’t as efficient as using a group since the destination list is broken up and the dispatch sent without checking to make sure duplicates aren’t sent down each path.
+1対多の会話で最も効率が悪いのは，クライアントがユーザーの’リスト’と会話するスタイルです．クライアントがメッセージの配送先のリストを与えると，サーバはそれを分割して，指定された配送先ごとにメッセージのコピーを送信します． これは，宛先リストが分割され，各経路に重複して送信されないことを確認せずにディスパッチが送信されるため，グループを使用する場合よりも効率的ではありません．
 
 #### 3.2.2 To a group (channel)
-In IRC the channel has a role equivalent to that of the multicast group; their existence is dynamic (coming and going as people join and leave channels) and the actual conversation carried out on a channel is only sent to servers which are supporting users on a given channel. If there are multiple users on a server in the same channel, the message text is sent only once to that server and then sent to each client on the channel. This action is then repeated for each client-server combination until the original message has fanned out and reached each member of the channel.
+IRCでは，チャネルはマルチキャストグループと同等の役割を持っています．その存在は動的であり（人々がチャネルに参加したり離れたりすることで行ったり来たりする），チャネル上で行われる実際の会話は，与えられたチャネル上のユーザーをサポートしているサーバにのみ送信されます．同じチャネルのサーバに複数のユーザーがいる場合，メッセージテキストはそのサーバに一度だけ送信され，その後チャネル内の各クライアントに送信されます．この動作は，元のメッセージが広がってチャネルの各メンバーに到達するまで，クライアントとサーバの組み合わせごとに繰り返されます．
 
-The following examples all refer to Figure 2.
+以下の例は，すべて図2を参照しています．
 
 * Example 4:
 
-    Any channel with 1 client in it. Messages to the channel go to the server and then nowhere else.
+    クライアントが1人いる任意のチャネル．チャネルへのメッセージはサーバに送られ，それ以外の場所には送られません．
 
 * Example 5:
 
-    2 clients in a channel. All messages traverse a path as if they were private messages between the two clients outside a channel.
+    チャネル内の2クライアント．すべてのメッセージは，チャネルの外にいる2つのクライアント間のプライベートメッセージであるかのように経路を通過します．
 
 * Example 6:
 
-    Clients 1, 2 and 3 in a channel. All messages to the channel are sent to all clients and only those servers which must be traversed by the message if it were a private message to a single client. If client 1 sends a message, it goes back to client 2 and then via server B to client 3.
+    クライアント1，2，3がチャネルを持つ．チャネルへのすべてのメッセージは，すべてのクライアントに送信され，それが単一のクライアントへのプライベートメッセージである場合，メッセージが通過しなければならないサーバにのみ送信されます．クライアント1がメッセージを送信すると，それはクライアント2に戻り，サーバBを経由してクライアント3に届きます．
 
 #### 3.2.3 To a host/server mask
-To provide IRC operators with some mechanism to send messages to a large body of related users, host and server mask messages are provided. These messages are sent to users whose host or server information match that of the mask. The messages are only sent to locations where users are, in a fashion similar to that of channels.
+IRCの運営者が，関連する多くのユーザーにメッセージを送るための何らかの仕組みを提供するために，ホストとサーバのマスクメッセージが提供されています．これらのメッセージは，ホストまたはサーバ情報がマスクに一致するユーザに送られます．メッセージは，チャネルと同様の方法で，ユーザがいる場所にのみ送信されます．
 
 ### 3.3 One-to-all
-The one-to-all type of message is better described as a broadcast message, sent to all clients or servers or both. On a large network of users and servers, a single message can result in a lot of traffic being sent over the network in an effort to reach all of the desired destinations.
+1対全のメッセージはブロードキャストメッセージと呼ばれ，すべてのクライアントまたはサーバ，あるいはその両方に送信されます．ユーザーとサーバからなる大規模なネットワークでは，1つのメッセージによって，希望するすべての宛先に到達するために，ネットワーク上で多くのトラフィックが送信されることになります．
 
-For some messages, there is no option but to broadcast it to all servers so that the state information held by each server is reasonably consistent between servers.
+メッセージによっては，各サーバが持つ状態情報がサーバ間で適度に整合するように，全サーバにブロードキャストする以外の選択肢はありません．
 
 #### 3.3.1 Client-to-Client
-There is no class of message which, from a single message, results in a message being sent to every other client.
+1つのメッセージから，他のすべてのクライアントにメッセージが送信されるようなメッセージのクラスは存在しません．
 
 #### 3.3.2 Client-to-Server
-Most of the commands which result in a change of state information (such as channel membership, channel mode, user status, etc) must be sent to all servers by default, and this distribution may not be changed by the client.
+状態情報の変更をもたらすコマンド（チャネルメンバーシップ，チャネルモード，ユーザステータスなど）のほとんどは，デフォルトですべてのサーバに送信されなければならず，この配布はクライアントによって変更することができません．
 
 #### 3.3.3 Server-to-Server.
-While most messages between servers are distributed to all ’other’ servers, this is only required for any message that affects either a user, channel or server. Since these are the basic items found in
-
-IRC, nearly all messages originating from a server are broadcast to all other connected servers.
+サーバ間のほとんどのメッセージは，すべての’他の’サーバに配布されますが，これは，ユーザー，チャネル，サーバのいずれかに影響を与えるメッセージにのみ必要です．これらは IRC で見られる基本的な項目ですので，あるサーバから発信されたほぼすべてのメッセージは，接続されている他のすべてのサーバにブロードキャストされます．
 
 ## 4. MESSAGE DETAILS
 On the following pages are descriptions of each message recognized by the IRC server and client. All commands described in this section must be implemented by any server for this protocol.
