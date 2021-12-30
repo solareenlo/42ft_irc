@@ -699,7 +699,7 @@ MODE WiZ -o             ; WiZ をオペレータでなくします（オペレ�
 Parameters:  <channel> [<topic>]
 ```
 
-The TOPIC message is used to change or view the topic of a channel.  The topic for channel \<channel\> is returned if there is no \<topic\> given. If the \<topic\> parameter is present, the topic for that channel will be changed, if the channel modes permit this action.
+TOPIC メッセージは，チャネルのトピックを変更または表示するために使用されます．\<topic\> が指定されていない場合は，チャネル \<channel\> のトピックが返されます．\<topic\> パラメータがある場合，チャネルモードが許可していれば，そのチャネルのトピックが変更されます．
 
 Numeric Replies:
 ```
@@ -710,11 +710,11 @@ Numeric Replies:
 
 Examples:
 ```
-:Wiz TOPIC #test :New topic    ;User Wiz setting the topic.
+:Wiz TOPIC #test :New topic    ;トピックを設定するユーザ Wiz．
 
-TOPIC #test :another topic     ;set the topic on #test to "another topic".
+TOPIC #test :another topic     ;#testのトピックを "別のトピック"に設定します．
 
-TOPIC #test                    ; check the topic for #test.
+TOPIC #test                    ; #testのトピックを確認します．
 ```
 
 #### 4.2.5 Names message
@@ -723,9 +723,9 @@ TOPIC #test                    ; check the topic for #test.
 Parameters:  [<channel>{,<channel>}]
 ```
 
-By using the NAMES command, a user can list all nicknames that are visible to them on any channel that they can see. Channel names which they can see are those which aren’t private (+p) or secret (+s) or those which they are actually on. The parameter specifies which channel(s) to return information about if valid.  There is no error reply for bad channel names.
+NAMES コマンドを使用すると，ユーザが見ることのできるチャネルに表示されているすべてのニックネームをリストアップすることができます．表示されるチャネル名は，プライベート (+p) やシークレット (+s) でないもの，または実際に参加しているチャネル名です．パラメータは，有効な場合に情報を返すチャネルを指定します． 不正なチャネル名に対するエラーの返事はありません．
 
-If no \<channel\> parameter is given, a list of all channels and their occupants is returned. At the end of this list, a list of users who are visible but either not on any channel or not on a visible channel are listed as being on ‘channel’ "\*".
+\<channel\> パラメータが与えられない場合，すべてのチャネルとその占有者のリストが返されます．このリストの最後には，表示されているがどのチャネルにも入っていない，または表示されているチャネルに入っていないユーザのリストが 'channel' "\*" に入っているとしてリストアップされます．
 
 Numerics:
 ```
@@ -734,9 +734,11 @@ Numerics:
 
 Examples:
 ```
-NAMES #twilight_zone,#42    ; list visible users on #twilight_zone and #42 if the channels are visible to you.
+NAMES #twilight_zone,#42
+        ; #twilight_zone と #42 のチャネルが表示されている場合，表示されているユーザをリストアップします．
 
-NAMES                       ; list all visible channels and users
+NAMES
+        ; 表示されているすべてのチャネルとユーザをリストアップします．
 ```
 
 #### 4.2.6 List message
@@ -745,7 +747,7 @@ NAMES                       ; list all visible channels and users
 Parameters:  [<channel>{,<channel>} [<server>]]
 ```
 
-The list message is used to list channels and their topics. If the \<channel\> parameter is used, only the status of that channel is displayed. Private channels are listed (without their topics) as channel "Prv" unless the client generating the query is actually on that channel. Likewise, secret channels are not listed at all unless the client is a member of the channel in question.
+リストメッセージは，チャネルとそのトピックを一覧表示するために使用されます．\<channel\> パラメータを使用した場合，そのチャネルの状態のみが表示されます．プライベートチャネルは，クエリを生成したクライアントが実際にそのチャネルにいない限り，チャネル "Prv" としてリストされます (トピックは含まれません)．同様に，シークレットチャネルは，クライアントがそのチャネルのメンバーでない限り，まったく表示されません．
 
 Numeric Replies:
 ```
@@ -755,9 +757,9 @@ Numeric Replies:
 
 Examples:
 ```
-LIST                       ; List all channels.
+LIST                       ;すべてのチャネルを一覧表示します．
 
-LIST #twilight_zone,#42    ; List channels #twilight_zone and #42
+LIST #twilight_zone,#42    ; #twilight_zone と #42 チェネルを一覧表示します．
 ```
 
 #### 4.2.7 Invite message
@@ -766,7 +768,7 @@ LIST #twilight_zone,#42    ; List channels #twilight_zone and #42
 Parameters:  <nickname> <channel>
 ```
 
-The INVITE message is used to invite users to a channel. The parameter \<nickname\> is the nickname of the person to be invited to the target channel \<channel\>. There is no requirement that the channel the target user is being invited to must exist or be a valid channel. To invite a user to a channel which is invite only (MODE +i), the client sending the invite must be recognised as being a channel operator on the given channel.
+INVITEメッセージは，ユーザをチャネルに招待するために使用されます．パラメータ \<nickname\> には，ターゲットチャネル \<channel\> に招待する人のニックネームを指定します．招待されるターゲットユーザが存在すること，または有効なチャネルであることは要求されません．招待専用チャネル（MODE +i）にユーザを招待するには，招待を送信するクライアントがそのチャネルのチャネルオペレータとして認識されている必要があります．
 
 Numeric Replies:
 ```
@@ -778,9 +780,9 @@ Numeric Replies:
 
 Examples:
 ```
-:Angel INVITE Wiz #Dust      ; User Angel inviting WiZ to channel #Dust
+:Angel INVITE Wiz #Dust      ; ユーザ Angel が WiZ をチャネル #Dust に招待しています．
 
-INVITE Wiz #Twilight_Zone    ; Command to invite WiZ to #Twilight_zone
+INVITE Wiz #Twilight_Zone    ; WiZ を #Twilight_zone に招待するコマンド
 ```
 
 #### 4.2.8 Kick message
@@ -789,7 +791,7 @@ INVITE Wiz #Twilight_Zone    ; Command to invite WiZ to #Twilight_zone
 Parameters:  <channel> <user> [<comment>]
 ```
 
-The KICK command can be used to forcibly remove a user from a channel. It ’kicks them out’ of the channel (forced PART). Only a channel operator may kick another user out of a channel.  Each server that receives a KICK message checks that it is valid (ie the sender is actually a channel operator) before removing the victim from the channel.
+KICKコマンドは，あるユーザをチャネルから強制的に排除するために使用します．これはチャネルから「追い出す」（forced PART）ことです．チャネルオペレータのみが他のユーザをチャネルから追い出すことができます．KICKメッセージを受信した各サーバは，それが有効であるかどうか（つまり，送信者が実際にチャネルオペレータであるかどうか）を，犠牲者をチャネルから追い出す前にチェックします．
 
 Numeric Replies:
 ```
@@ -800,15 +802,18 @@ Numeric Replies:
 
 Examples:
 ```
-KICK &Melbourne Matthew                 ; Kick Matthew from &Melbourne
+KICK &Melbourne Matthew
+        ; チャネル &Melbourne から Matthew をキックします．
 
-KICK #Finnish John :Speaking English    ; Kick John from #Finnish using "Speaking English" as the reason (comment).
+KICK #Finnish John :Speaking English
+        ; 英語で話すことを理由（コメント）に #Finnish から John をキックします．
 
-:WiZ KICK #Finnish John                 ; KICK message from WiZ to remove John from channel #Finnish
+:WiZ KICK #Finnish John
+        ; チャネル #Finnish から John を削除するという Wiz からのキックメッセージ．
 ```
 
 NOTE:
-    It is possible to extend the KICK command parameters to the following:
+    KICKコマンドのパラメータを以下に拡張することが可能です．
 
 \<channel\>{,\<channel\>} \<user\>{,\<user\>} [\<comment\>]
 
