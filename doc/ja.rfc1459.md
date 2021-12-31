@@ -815,12 +815,14 @@ KICK #Finnish John :Speaking English
 NOTE:
     KICKコマンドのパラメータを以下に拡張することが可能です．
 
-\<channel\>{,\<channel\>} \<user\>{,\<user\>} [\<comment\>]
+```
+<channel>{,<channel>} <user>{,<user>} [<comment>]
+```
 
 ### 4.3 Server queries and commands
-The server query group of commands has been designed to return information about any server which is connected to the network. All servers connected must respond to these queries and respond correctly. Any invalid response (or lack thereof) must be considered a sign of a broken server and it must be disconnected/disabled as soon as possible until the situation is remedied.
+サーバ問合せコマンド群は，ネットワークに接続されているあらゆるサーバの情報を返すように設計されています．接続されているすべてのサーバは，これらの問い合わせに応答し，正しく応答する必要があります．無効な応答（またはその欠如）は，サーバの故障の兆候とみなされ，状況が改善されるまでできるだけ早く切断/無効化されなければなりません．
 
-In these queries, where a parameter appears as "<server>", it will usually mean it can be a nickname or a server or a wildcard name of some sort. For each parameter, however, only one query and set of replies is to be generated.
+これらのクエリにおいて，パラメータが"\<server\>"と表示される場合，それは通常，ニックネーム，サーバ，またはある種のワイルドカード名である可能性があることを意味します．しかし，各パラメータに対して，1つのクエリと返信のセットしか生成されません．
 
 #### 4.3.1 Version message
 ```
@@ -828,7 +830,7 @@ In these queries, where a parameter appears as "<server>", it will usually mean 
 Parameters:  [<server>]
 ```
 
-The VERSION message is used to query the version of the server program. An optional parameter <server> is used to query the version of the server program which a client is not directly connected to.
+VERSION メッセージはサーバプログラムのバージョンを問い合わせるために使用されます．オプションのパラメータ \<server\> は，クライアントが直接接続していないサーバプログラムのバージョンを問い合わせるために使用されます．
 
 Numeric Replies:
 ```
@@ -837,9 +839,11 @@ Numeric Replies:
 
 Examples:
 ```
-:Wiz VERSION *.se         ; message from Wiz to check the version of a server matching "*.se"
+:Wiz VERSION *.se
+		; Wizから "*.se" に一致するサーバのバージョンを確認するメッセージ
 
-VERSION tolsun.oulu.fi    ; check the version of server "tolsun.oulu.fi".
+VERSION tolsun.oulu.fi
+		; サーバ "tolsun.oulu.fi "のバージョンを確認します．
 ```
 
 #### 4.3.2 Stats message
@@ -848,22 +852,22 @@ VERSION tolsun.oulu.fi    ; check the version of server "tolsun.oulu.fi".
 Parameters:  [<query> [<server>]]
 ```
 
-The stats message is used to query statistics of certain server. If <server> parameter is omitted, only the end of stats reply is sent back. The implementation of this command is highly dependent on the server which replies, although the server must be able to supply information as described by the queries below (or similar).
+statsメッセージは，特定のサーバの統計情報を問い合わせるために使用されます．\<server\> パラメータを省略した場合は，stats メッセージの末尾のみを返送します．本コマンドの実装は返信するサーバに大きく依存しますが，サーバは以下のクエリ（または類似のもの）で記述された情報を提供できる必要があります．
 
-A query may be given by any single letter which is only checked by the destination server (if given as the <server> parameter) and is otherwise passed on by intermediate servers, ignored and unaltered.  The following queries are those found in the current IRC implementation and provide a large portion of the setup information for that server. Although these may not be supported in the same way by other versions, all servers should be able to supply a valid reply to a STATS query which is consistent with the reply formats currently used and the purpose of the query.
+クエリは任意の一文字で指定することができ，(\<server\> パラメータとして指定された場合) 宛先サーバでのみ確認され，それ以外は中間サーバによって無視され，変更されずに渡されます． 以下のクエリは現在の IRC の実装で見られるもので，そのサーバのセットアップ情報の大部分を提供します．これらは他のバージョンでは同じようにサポートされていないかもしれませんが，すべてのサーバは現在使用されている応答フォーマットとクエリの目的に合致した，STATS クエリに対する有効な応答を提供することができるはずです．
 
-The currently supported queries are:
+現在対応しているクエリは以下の通りです．
 
 ```
-    c - returns a list of servers which the server may connect to or allow connections from;
-    h - returns a list of servers which are either forced to be treated as leaves or allowed to act as hubs;
-    i - returns a list of hosts which the server allows a client to connect from;
-    k - returns a list of banned username/hostname combinations for that server;
-    l - returns a list of the server’s connections, showing how long each connection has been established and the traffic over that connection in bytes and messages for each direction;
-    m - returns a list of commands supported by the server and the usage count for each if the usage count is non zero;
-    o - returns a list of hosts from which normal clients may become operators;
-    y - show Y (Class) lines from server’s configuration file;
-    u - returns a string showing how long the server has been up.
+    c - サーバが接続する，あるいは接続を許可するサーバのリストを返します;
+	h - 強制的に離脱として扱われるか，ハブとして動作することが許可されているサーバのリストを返します;
+	i - サーバがクライアントからの接続を許可するホストのリストを返します;
+	k - そのサーバでバンされているユーザ名とホスト名の組み合わせのリストを返します;
+	l - サーバの接続のリストを返します．各接続の確立時間，およびその接続上のトラフィックを各方向のバイトとメッセージで表示します．
+	m - サーバがサポートするコマンドのリストと，使用回数が0でない場合は，それぞれの使用回数を返します;
+	o - 通常のクライアントがオペレータになることができるホストのリストを返します;
+	y - サーバの構成ファイルから Y (クラス) 行を表示します;
+	u - サーバが稼働していた時間を示す文字列を返します．
 ```
 
 Numeric Replies:
@@ -879,8 +883,8 @@ Numeric Replies:
 
 Examples:
 ```
-STATS m                 ; check the command usage for the server you are connected to
-:Wiz STATS c eff.org    ; request by WiZ for C/N line information from server eff.org
+STATS m                 ; 接続しているサーバのコマンドの使用状況を確認します．
+:Wiz STATS c eff.org    ; WiZによるサーバ eff.org からの C/N ライン情報のリクエスト．
 ```
 
 #### 4.3.3 Links message
@@ -889,7 +893,7 @@ STATS m                 ; check the command usage for the server you are connect
 Parameters:  [[<remote server>] <server mask>]
 ```
 
-With LINKS, a user can list all servers which are known by the server answering the query. The returned list of servers must match the mask, or if no mask is given, the full list is returned.  If <remote server> is given in addition to <server mask>, the LINKS command is forwarded to the first server found that matches that name (if any), and that server is then required to answer the query.
+LINKSを使用すると，ユーザはクエリに応答するサーバが知っているすべてのサーバをリストアップすることができます．返されるサーバのリストはマスクと一致しなければならず，マスクが与えられない場合は完全なリストが返されます．\<server mask\> に加えて \<remote server\> が指定された場合，LINKS コマンドはその名前にマッチする最初のサーバに転送され，そのサーバは問い合わせに応答することが要求されます．
 
 Numeric Replies:
 ```
@@ -899,9 +903,9 @@ Numeric Replies:
 
 Examples:
 ```
-LINKS *.au                   ; list all servers which have a name that matches *.au;
+LINKS *.au                   ; *.au に一致する名前を持つすべてのサーバをリストアップします．
 
-:WiZ LINKS *.bu.edu *.edu    ; LINKS message from WiZ to the first server matching *.edu for a list of servers matching *.bu.edu.
+:WiZ LINKS *.bu.edu *.edu    ; WiZから *.bu.edu に一致するサーバリストの* .edu に最初にマッチするサーバへのLINKSメッセージ．
 ```
 
 #### 4.3.4 Time message
@@ -910,7 +914,7 @@ LINKS *.au                   ; list all servers which have a name that matches *
 Parameters:  [<server>]
 ```
 
-The time message is used to query local time from the specified server. If the server parameter is not given, the server handling the command must reply to the query.
+time メッセージは，指定されたサーバからローカルタイムを問い合わせるために使用されます．server パラメータが指定されない場合，コマンドを処理するサーバは問い合わせに応答する必要があります．
 
 Numeric Replies:
 ```
@@ -919,8 +923,8 @@ Numeric Replies:
 
 Examples:
 ```
-TIME tolsun.oulu.fi    ; check the time on the server "tolson.oulu.fi"
-Angel TIME *.au        ; user angel checking the time on a server matching "*.au"
+TIME tolsun.oulu.fi    ; サーバ "tolson.oulu.fi" の時刻を確認します．
+Angel TIME *.au        ; ユーザ Angel が "*.au" に一致するサーバで時刻を確認しています．
 ```
 
 #### 4.3.5 Connect message
@@ -929,7 +933,7 @@ Angel TIME *.au        ; user angel checking the time on a server matching "*.au
 Parameters:  <target server> [<port> [<remote server>]]
 ```
 
-The CONNECT command can be used to force a server to try to establish a new connection to another server immediately. CONNECT is a privileged command and is to be available only to IRC Operators. If a remote server is given then the CONNECT attempt is made by that server to <target server> and <port>.
+CONNECT コマンドは，サーバが他のサーバとの新しい接続を直ちに確立しようとすることを強制するために使用することができます．CONNECT は特権的なコマンドであり，IRC オペレータのみが使用することができます．リモートサーバが指定された場合，そのサーバは \<target server\> と \<port\> に対して CONNECT を試みます．
 
 Numeric Replies:
 ```
@@ -939,9 +943,11 @@ Numeric Replies:
 
 Examples:
 ```
-CONNECT tolsun.oulu.fi                  ; Attempt to connect a server to tolsun.oulu.fi
+CONNECT tolsun.oulu.fi
+		; tolsun.oulu.fi へのサーバ接続を試みます．
 
-:WiZ CONNECT eff.org 6667 csd.bu.edu    ; CONNECT attempt by WiZ to get servers eff.org and csd.bu.edu connected on port 6667.
+:WiZ CONNECT eff.org 6667 csd.bu.edu
+		; WiZ がサーバ eff.org と csd.bu.edu をポート6667で接続するためにCONNECTを試みました．
 ```
 
 #### 4.3.6 Trace message
@@ -950,19 +956,18 @@ CONNECT tolsun.oulu.fi                  ; Attempt to connect a server to tolsun.
 Parameters:  [<server>]
 ```
 
-TRACE command is used to find the route to specific server. Each server that processes this message must tell the sender about it by sending a reply indicating it is a pass-through link, forming a chain of replies similar to that gained from using "traceroute". After sending this reply back, it must then send the TRACE message to the next server until given server is reached. If the <server> parameter is omitted, it is recommended that TRACE command send a message to the sender telling which servers the current server has direct connection to.
+TRACEコマンドは，特定のサーバへの経路を検索するために使用されます．このメッセージを処理する各サーバは，パススルーリンクであることを示す応答を送信して送信者に伝える必要があり，"traceroute" を使用して得られるのと同様の応答の連鎖を形成します．この応答を送り返した後，指定されたサーバに到達するまで，次のサーバに TRACE メッセージを送信しなければなりません．\<server\> パラメータが省略された場合，TRACE コマンドは，現在のサーバがどのサーバに直接接続しているかを送信者に伝えるメッセージを送信することが推奨されます．
 
-If the destination given by "<server>" is an actual server, then the destination server is required to report all servers and users which are connected to it, although only operators are permitted to see users present. If the destination given by <server> is a nickname, they only a reply for that nickname is given.
+"\<server\>" で指定された送信先が実際のサーバである場合，送信先サーバは接続されているすべてのサーバとユーザを報告する必要がありますが，オペレータのみがユーザの存在を確認することを許可されます．\<server\> で指定された宛先がニックネームの場合，そのニックネームに対する応答のみが返されます．
 
 Numeric Replies:
 ```
     ERR_NOSUCHSERVER
 
-If the TRACE message is destined for another server, all intermediate servers must return a RPL_TRACELINK reply to indicate that the TRACE passed through it and where its going next.
+TRACEメッセージが他のサーバに向けられた場合，すべての中間サーバはRPL_TRACELINK応答を返し，TRACEがそれを通過したことと次の行き先を示す必要があります．
 
     RPL_TRACELINK
-A TRACE reply may be composed of any number of the following numeric
-replies.
+TRACE応答は，以下の数値応答からいくつでも構成することができます．
 
     RPL_TRACECONNECTING    RPL_TRACEHANDSHAKE
     RPL_TRACEUNKNOWN       RPL_TRACEOPERATOR
@@ -973,9 +978,9 @@ replies.
 
 Examples:
 ```
-TRACE *.oulu.fi         ; TRACE to a server matching *.oulu.fi
+TRACE *.oulu.fi         ; *.oulu.fi に一致するサーバへの TRACE．
 
-:WiZ TRACE AngelDust    ; TRACE issued by WiZ to nick AngelDust
+:WiZ TRACE AngelDust    ; WiZ が AngelDust のニックネームに対して発行した TRACE．
 ```
 
 #### 4.3.7 Admin command
@@ -984,7 +989,7 @@ Command   :  ADMIN
 Parameters:  [<server>]
 ```
 
-The admin message is used to find the name of the administrator of the given server, or current server if <server> parameter is omitted.  Each server must have the ability to forward ADMIN messages to other servers.
+adminメッセージは，指定されたサーバ（\<server\>パラメータが省略された場合は現在のサーバ）の管理者名を検索するために使用されます．各サーバは，ADMINメッセージを他のサーバに転送する機能を持つ必要があります．
 
 Numeric Replies:
 ```
@@ -995,8 +1000,8 @@ Numeric Replies:
 
 Examples:
 ```
-ADMIN tolsun.oulu.fi    ; request an ADMIN reply from tolsun.oulu.fi
-:WiZ ADMIN *.edu        ; ADMIN request from WiZ for first server found to match *.edu.
+ADMIN tolsun.oulu.fi    ; tolsun.oulu.fi からADMINの返信を要求します．
+:WiZ ADMIN *.edu        ; WiZからの *.edu に一致する最初のサーバへのADMINリクエスト．
 ```
 
 #### 4.3.8 Info command
@@ -1005,7 +1010,7 @@ ADMIN tolsun.oulu.fi    ; request an ADMIN reply from tolsun.oulu.fi
 Parameters:  [<server>]
 ```
 
-The INFO command is required to return information which describes the server: its version, when it was compiled, the patchlevel, when it was started, and any other miscellaneous information which may be considered to be relevant.
+INFOコマンドは，サーバのバージョン，コンパイル日，パッチレベル，起動日，その他関連すると思われる雑多な情報など，サーバに関する情報を返すことが要求されます．
 
 Numeric Replies:
 ```
@@ -1015,9 +1020,9 @@ Numeric Replies:
 
 Examples:
 ```
-INFO csd.bu.edu      ; request an INFO reply from csd.bu.edu
-:Avalon INFO *.fi    ; INFO request from Avalon for first server found to match *.fi.
-INFO Angel           ; request info from the server that Angel is connected to.
+INFO csd.bu.edu      ; csd.bu.eduからINFOの返信を要求します．
+:Avalon INFO *.fi    ; Avalonからの *.fi に一致する最初のサーバへのINFOリクエスト．
+INFO Angel           ; Angelが接続されているサーバに情報を要求します．
 ```
 
 ### 4.4 Sending messages
