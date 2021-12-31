@@ -1026,7 +1026,7 @@ INFO Angel           ; Angelが接続されているサーバに情報を要求�
 ```
 
 ### 4.4 Sending messages
-The main purpose of the IRC protocol is to provide a base for clients to communicate with each other. PRIVMSG and NOTICE are the only messages available which actually perform delivery of a text message from one client to another - the rest just make it possible and try to ensure it happens in a reliable and structured manner.
+IRCプロトコルの主な目的は，クライアントが互いに通信するための基盤を提供することです．PRIVMSG と NOTICE は，あるクライアントから別のクライアントへのテキストメッセージの配信を実際に実行する唯一のメッセージです - 残りはそれを可能にし，それが信頼できる構造化された方法で起こることを確実にしようとするだけです．
 
 #### 4.4.1 Private messages
 ```
@@ -1034,9 +1034,9 @@ The main purpose of the IRC protocol is to provide a base for clients to communi
 Parameters:  <receiver>{,<receiver>} <text to be sent>
 ```
 
-PRIVMSG is used to send private messages between users. <receiver> is the nickname of the receiver of the message. <receiver> can also be a list of names or channels separated with commas.
+PRIVMSGは，ユーザ間のプライベートメッセージの送信に使用されます．\<receiver\> には，メッセージの受信者のニックネームを指定します．\<receiver\> はカンマで区切られた名前またはチャネルのリストでもかまいません．
 
-The <receiver> parameter may also me a host mask (#mask) or server mask ($mask). In both cases the server will only send the PRIVMSG to those who have a server or host matching the mask. The mask must have at least 1 (one) "." in it and no wildcards following the last ".". This requirement exists to prevent people sending messages to "#*" or "$*", which would broadcast to all users; from experience, this is abused more than used responsibly and properly.  Wildcards are the ’*’ and ’?’ characters. This extension to the PRIVMSG command is only available to Operators.
+\<receiver\> パラメータには，ホストマスク (#mask) またはサーバマスク ($mask) を指定することもできます．どちらの場合も，サーバはこのマスクに一致するサーバやホストを持つ人にのみ PRIVMSG を送ります．マスクには少なくとも1つの "." が必要で，最後の "." の後にはワイルドカードを使用しないでください．この条件は，"#*" や "$*" にメッセージを送ると，すべてのユーザにブロードキャストされてしまうのを防ぐためにあります．経験上，これは責任を持って適切に使われるよりも悪用されることが多いです． ワイルドカードとは，’*’ および ’?’ 文字のことです．この PRIVMSG コマンドの拡張は，オペレータのみが使用できます．
 
 Numeric Replies:
 ```
@@ -1050,15 +1050,15 @@ Numeric Replies:
 Examples:
 ```
 :Angel PRIVMSG Wiz :Hello are you receiving this message ?
-        ; Message from Angel to Wiz.
+        ; Angel からの Wiz へのメッセージ
 PRIVMSG Angel :yes I’m receiving it !receiving it !’u>(768u+1n) .br
-        ; Message to Angel.
+        ; Angel へのメッセージ
 PRIVMSG jto@tolsun.oulu.fi :Hello !
-        ; Message to a client on server tolsun.oulu.fi with username of "jto".
+        ; サーバ tolsun.oulu.fi のユーザ名 "jto" のクライアントへのメッセージ．
 PRIVMSG $*.fi :Server tolsun.oulu.fi rebooting.
-        ; Message to everyone on a server which has a name matching *.fi.
+        ; *.fi に一致する名前を持つサーバ上のすべての人へのメッセージ．
 PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
-        ; Message to all users who come from a host which has a name matching *.edu.
+        ; ホスト名が *.edu に一致するホストから来たすべてのユーザへのメッセージ．
 ```
 
 #### 4.4.2 Notice
@@ -1067,12 +1067,12 @@ PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
 Parameters:  <nickname> <text>
 ```
 
-The NOTICE message is used similarly to PRIVMSG. The difference between NOTICE and PRIVMSG is that automatic replies must never be sent in response to a NOTICE message. This rule applies to servers too - they must not send any error reply back to the client on receipt of a notice. The object of this rule is to avoid loops between a client automatically sending something in response to something it received. This is typically used by automatons (clients with either an AI or other interactive program controlling their actions) which are always seen to be replying lest they end up in a loop with another automaton.
+NOTICEメッセージは，PRIVMSGと同様に使用される．NOTICE と PRIVMSG の違いは，NOTICE メッセージに応答して自動返信が決して送られてはならないことです．このルールはサーバにも適用されます．サーバは，NOTICEを受信したときに，クライアントにいかなるエラー返信も送り返してはいけません．このルールの目的は，クライアントが受信した何かに応答して自動的に何かを送信する間のループを避けることです．これは，オートマトン(AIや他の対話的なプログラムが行動を制御しているクライアント)によって典型的に使われます．オートマトンは，他のオートマトンとループになってしまわないように，常に返信しているように見えます．
 
-See PRIVMSG for more details on replies and examples.
+返信の詳細および例については，PRIVMSGを参照してください．
 
 ### 4.5 User based queries
-User queries are a group of commands which are primarily concerned with finding details on a particular user or group users. When using wildcards with any of these commands, if they match, they will only return information on users who are ’visible’ to you. The visibility of a user is determined as a combination of the user’s mode and the common set of channels you are both on.
+ユーザクエリは，特定のユーザまたはグループユーザの詳細を検索することを主目的とするコマンド群です．これらのコマンドでワイルドカードを使用する場合，それらが一致すると，あなたが’見える’ユーザの情報のみが返されます．ユーザの可視性は，ユーザのモードと，あなたが共にいる共通のチャネルセットの組み合わせで決定されます．
 
 #### 4.5.1 Who query
 ```
@@ -1080,9 +1080,9 @@ User queries are a group of commands which are primarily concerned with finding 
 Parameters:  [<name> [<o>]]
 ```
 
-The WHO message is used by a client to generate a query which returns a list of information which ’matches’ the <name> parameter given by the client. In the absence of the <name> parameter, all visible (users who aren’t invisible (user mode +i) and who don’t have a common channel with the requesting client) are listed. The same result can be achieved by using a <name> of "0" or any wildcard which will end up matching every entry possible.
+WHOメッセージはクライアントがクエリを生成する際に使用され，クライアントが指定した \<name\> パラメータに「一致」する情報のリストを返します．\<name\> パラメータがない場合，すべての可視 (不可視 (ユーザモード +i) でなく，要求元のクライアントと共通のチャネルを持っていないユーザ) のリストが表示されます．\<name\> に "0" やワイルドカードを使用しても同じ結果が得られますが，これは可能な限りすべてのエントリーにマッチすることになります．
 
-The <name> passed to WHO is matched against users’ host, server, real name and nickname if the channel <name> cannot be found.  If the "o" parameter is passed only operators are returned according to the name mask supplied.
+WHO に渡された \<name\> は，チャネル \<name\> が見つからない場合，ユーザのホスト，サーバ，実名，ニックネームと照合されます．"o" パラメータを渡した場合は，与えられた名前マスクに従って，オペレータのみが返されます．
 
 Numeric Replies:
 ```
@@ -1092,8 +1092,8 @@ Numeric Replies:
 
 Examples:
 ```
-WHO *.fi      ; List all users who match against "*.fi".
-WHO jto* o    ; List all users with a match against "jto*" if they are an operator.
+WHO *.fi      ; "*.fi" にマッチするすべてのユーザをリストアップします．
+WHO jto* o    ; "jto*" にマッチするユーザがオペレータである場合，そのユーザをすべてリストアップします．
 ```
 
 #### 4.5.2 Whois query
@@ -1102,9 +1102,9 @@ WHO jto* o    ; List all users with a match against "jto*" if they are an operat
 Parameters:  [<server>] <nickmask>[,<nickmask>[,...]]
 ```
 
-This message is used to query information about particular user. The server will answer this message with several numeric messages indicating different statuses of each user which matches the nickmask (if you are entitled to see them). If no wildcard is present in the <nickmask>, any information about that nick which you are allowed to see is presented. A comma (’,’) separated list of nicknames may be given.
+このメッセージは，特定のユーザに関する情報を問い合わせるために使用されます．サーバはこのメッセージに対して，ニックネームと一致する各ユーザの異なるステータスを示すいくつかの数値メッセージを返します(あなたがそれらを見る権利がある場合)．\<nickmask\> にワイルドカードが指定されていない場合は，そのニックネームに関する，閲覧可能なすべての情報が表示されます．カンマ (’,’) で区切ったニックネームのリストを指定することもできます．
 
-The latter version sends the query to a specific server. It is useful if you want to know how long the user in question has been idle as only local server (ie. the server the user is directly connected to) knows that information, while everything else is globally known.
+後者は，特定のサーバに問い合わせを行うものです．ローカルサーバ（つまり，ユーザが直接接続しているサーバ）だけがその情報を知っており，他のすべてはグローバルに知られているので，問題のユーザがどれくらいアイドル状態であったかを知りたい場合に有用です．
 
 Numeric Replies:
 ```
@@ -1118,8 +1118,8 @@ Numeric Replies:
 
 Examples:
 ```
-WHOIS wiz                 ; return available user information about nick WiZ
-WHOIS eff.org trillian    ; ask server eff.org for user information about trillian
+WHOIS wiz                 ; nick WiZ に関する利用可能なユーザ情報を返します．
+WHOIS eff.org trillian    ; trillian に関するユーザ情報をサーバ eff.org に問い合わせます．
 ```
 
 #### 4.5.3 Whowas
@@ -1128,7 +1128,7 @@ WHOIS eff.org trillian    ; ask server eff.org for user information about trilli
 Parameters:  <nickname> [<count> [<server>]]
 ```
 
-Whowas asks for information about a nickname which no longer exists.  This may either be due to a nickname change or the user leaving IRC.  In response to this query, the server searches through its nickname history, looking for any nicks which are lexically the same (no wild card matching here). The history is searched backward, returning the most recent entry first. If there are multiple entries, up to <count> replies will be returned (or all of them if no <count> parameter is given). If a non-positive number is passed as being <count>, then a full search is done.
+Whowas は，もう存在しないニックネームに関する情報を要求します．これはニックネームの変更か，ユーザが IRC を去ったかのどちらかでしょう．この問い合わせに対して，サーバはニックネームの履歴を検索し，辞書的に同じニックネームを探します (ここではワイルドカードによるマッチングは行いません)．履歴は後方から検索され，最新のエントリが最初に返されます．複数のエントリがある場合は，\<count\> 個までの返答が返されます (\<count\> パラメータが与えられていない場合は，それらすべてが返されます)．\<count\> として正でない数字が渡された場合，完全な検索が行われます．
 
 Numeric Replies:
 ```
@@ -1139,9 +1139,12 @@ Numeric Replies:
 
 Examples:
 ```
-WHOWAS Wiz                 ; return all information in the nick history about nick "WiZ";
-WHOWAS Mermaid 9           ; return at most, the 9 most recent entries in the nick history for "Mermaid";
-WHOWAS Trillian 1 *.edu    ; return the most recent history for "Trillian" from the first server found to match "*.edu".
+WHOWAS Wiz
+		; ニックネーム "WiZ" に関するニックネーム履歴の全情報を返します;
+WHOWAS Mermaid 9
+		; "Mermaid" のニックネーム履歴のうち，最大で最新の9件を返します;
+WHOWAS Trillian 1 *.edu
+		; "Trillian" の最新の履歴を，"*.edu" にマッチする最初のサーバから返します．
 ```
 
 ### 4.6 Miscellaneous messages
