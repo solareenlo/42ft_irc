@@ -1139,16 +1139,13 @@ Numeric Replies:
 
 Examples:
 ```
-WHOWAS Wiz
-		; ニックネーム "WiZ" に関するニックネーム履歴の全情報を返します;
-WHOWAS Mermaid 9
-		; "Mermaid" のニックネーム履歴のうち，最大で最新の9件を返します;
-WHOWAS Trillian 1 *.edu
-		; "Trillian" の最新の履歴を，"*.edu" にマッチする最初のサーバから返します．
+WHOWAS Wiz                ; ニックネーム "WiZ" に関するニックネーム履歴の全情報を返します;
+WHOWAS Mermaid 9          ; "Mermaid" のニックネーム履歴のうち，最大で最新の9件を返します;
+WHOWAS Trillian 1 *.edu    ; "Trillian" の最新の履歴を，"*.edu" にマッチする最初のサーバから返します．
 ```
 
 ### 4.6 Miscellaneous messages
-Messages in this category do not fit into any of the above categories but are nonetheless still a part of and required by the protocol.
+このカテゴリのメッセージは、上記のどのカテゴリにも当てはまらないが、それでもプロトコルの一部であり、要求されるものです。
 
 #### 4.6.1 Kill message
 ```
@@ -1156,13 +1153,13 @@ Command   :  KILL
 Parameters:  <nickname> <comment>
 ```
 
-The KILL message is used to cause a client-server connection to be closed by the server which has the actual connection. KILL is used by servers when they encounter a duplicate entry in the list of valid nicknames and is used to remove both entries. It is also available to operators.
+KILL メッセージは、クライアントとサーバーの接続を、実際に接続しているサーバーに閉じさせるために使用されます。KILL は、有効なニックネームのリストに重複したエントリがある場合に、サーバによって使用され、両方のエントリを削除するために使用されます。また、オペレータも利用することができます。
 
-Clients which have automatic reconnect algorithms effectively make this command useless since the disconnection is only brief. It does however break the flow of data and can be used to stop large amounts of being abused, any user may elect to receive KILL messages generated for others to keep an ’eye’ on would be trouble spots.
+自動再接続のアルゴリズムを持っているクライアントは、切断が短時間であるため、このコマンドは事実上無意味です。しかし、データの流れを断ち切り、大量の不正使用を阻止するために使うことができます。どのユーザでも、他のユーザがトラブルスポットを ’監視’ するために生成された KILL メッセージを受け取ることを選択できます。
 
-In an arena where nicknames are required to be globally unique at all times, KILL messages are sent whenever ’duplicates’ are detected (that is an attempt to register two users with the same nickname) in the hope that both of them will disappear and only 1 reappear.
+ニックネームは常にグローバルにユニークであることが要求されるため、’重複’（同じニックネームで2人のユーザーを登録しようとすること）が検出されるたびにKILLメッセージが送られ、2人とも消えて1人だけが再び現れることが期待されるのです。
 
-The comment given must reflect the actual reason for the KILL. For server-generated KILLs it usually is made up of details concerning the origins of the two conflicting nicknames. For users it is left up to them to provide an adequate reason to satisfy others who see it. To prevent/discourage fake KILLs from being generated to hide the identify of the KILLer, the comment also shows a ’kill-path’ which is updated by each server it passes through, each prepending its name to the path.
+コメントには、KILL の実際の理由を反映させる必要があります。サーバーが生成した KILL の場合は、通常、2 つの衝突するニックネームの起源に関する詳細が含まれます。ユーザーの場合は、それを見た人が満足するような適切な理由を提供するように任されています。KILLer を隠すために偽の KILL が生成されるのを防ぐために、コメントには 'kill-path' が表示され、通過する各サーバによってそのパスが更新され、それぞれのサーバ名が先頭に追加されます。
 
 Numeric Replies:
 ```
@@ -1173,11 +1170,11 @@ Numeric Replies:
 Examples:
 ```
 KILL David (csd.bu.edu <- tolsun.oulu.fi)
-        ; Nickname collision between csd.bu.edu and tolson.oulu.fi
+        ; csd.bu.edu と tolson.oulu.fi の間のニックネームの衝突
 ```
 
 NOTE:
-It is recommended that only Operators be allowed to kill other users with KILL message. In an ideal world not even operators would need to do this and it would be left to servers to deal with.
+オペレーターだけが KILL メッセージで他のユーザーを KILL することができるようにすることを推奨します。理想的な世界では、オペレーターでさえもこれを行う必要はなく、サーバーが対処することになるでしょう。
 
 #### 4.6.2 Ping message
 ```
@@ -1185,9 +1182,9 @@ Command   :  PING
 Parameters:  <server1> [<server2>]
 ```
 
-The PING message is used to test the presence of an active client at the other end of the connection. A PING message is sent at regular intervals if no other activity detected coming from a connection. If a connection fails to respond to a PING command within a set amount of time, that connection is closed.
+PING メッセージは、接続の相手側にアクティブなクライアントが存在するかどうかをテストするために使用されます。PING メッセージは、接続から他のアクティビティが検出されない場合、一定の間隔で送信されます。接続が一定時間内に PING コマンドに応答しない場合、その接続は閉じられます。
 
-Any client which receives a PING message must respond to <server1> (server which sent the PING message out) as quickly as possible with an appropriate PONG message to indicate it is still there and alive.  Servers should not respond to PING commands but rely on PINGs from the other end of the connection to indicate the connection is alive.  If the <server2> parameter is specified, the PING message gets forwarded there.
+PING メッセージを受け取ったクライアントは、できるだけ早く \<server1\>（PING メッセージを発信したサーバー）に適切な PONG メッセージで応答し、自分がまだそこにいて生きていることを示さなければなりません。サーバは PING コマンドに応答せず、接続の相手側からの PING に依存して、接続が生きていることを示さなければなりません。\<server2\> パラメータが指定された場合、PING メッセージはそこに転送されます。
 
 Numeric Replies:
 ```
@@ -1196,8 +1193,8 @@ Numeric Replies:
 
 Examples:
 ```
-PING tolsun.oulu.fi    ; server sending a PING message to another server to indicate it is still alive.
-PING WiZ               ; PING message being sent to nick WiZ
+PING tolsun.oulu.fi    ; サーバーが他のサーバーに PING メッセージを送信し、自分が生きていることを示します．
+PING WiZ               ; ニックネーム WiZ に PING メッセージを送信します。
 ```
 
 #### 4.6.3 Pong message
@@ -1206,7 +1203,7 @@ Command   :  PONG
 Parameters:  <daemon> [<daemon2>]
 ```
 
-PONG message is a reply to ping message. If parameter <daemon2> is given this message must be forwarded to given daemon. The <daemon> parameter is the name of the daemon who has responded to PING message and generated this message.
+PONG メッセージは、Ping メッセージに対する返信です。パラメータ \<daemon2\> が指定された場合、このメッセージは指定されたデーモンに転送されなければなりません。\<daemon\> パラメータには、PING メッセージに応答し、このメッセージを生成したデーモンの名前を指定します。
 
 Numeric Replies:
 ```
@@ -1215,7 +1212,7 @@ Numeric Replies:
 
 Examples:
 ```
-PONG csd.bu.edu tolsun.oulu.fi    ; PONG message from csd.bu.edu to tolsun.oulu.fi
+PONG csd.bu.edu tolsun.oulu.fi    ; csd.bu.edu から tolsun.oulu.fi への PONG メッセージ
 ```
 
 #### 4.6.4 Error
@@ -1224,11 +1221,11 @@ Command   :  ERROR
 Parameters:  <error message>
 ```
 
-The ERROR command is for use by servers when reporting a serious or fatal error to its operators. It may also be sent from one server to another but must not be accepted from any normal unknown clients.
+ERROR コマンドは、サーバーが重大な、あるいは致命的なエラーをオペレーターに報告するときに使用します。また、あるサーバーから別のサーバーに送信することもできますが、通常の未知のクライアントからは受け入れてはいけません。
 
-An ERROR message is for use for reporting errors which occur with a server-to-server link only. An ERROR message is sent to the server at the other end (which sends it to all of its connected operators) and to all operators currently connected. It is not to be passed onto any other servers by a server if it is received from a server.
+ERROR メッセージは、サーバー間のリンクで発生したエラーを報告するためにのみ使用されます。ERROR メッセージは、相手側のサーバー（相手側のサーバーは ERROR メッセージをその接続されているすべてのオペレーターに送る）と、現在接続されているすべてのオペレーターに送られます。サーバーから受信した場合、サーバーによって他のサーバーに渡されることはありません。
 
-When a server sends a received ERROR message to its operators, the message should be encapsulated inside a NOTICE message, indicating that the client was not responsible for the error.
+サーバーが受信した ERROR メッセージをそのオペレータに送るとき、メッセージは NOTICE メッセージの中にカプセル化され、クライアントがそのエラーに対して責任がないことを示すべきです。
 
 Numerics:
 ```
@@ -1238,9 +1235,9 @@ Numerics:
 Examples:
 ```
 ERROR :Server *.fi already exists
-        ; ERROR message to the other server which caused this error.
+		; このエラーを発生させた相手サーバーへの ERROR メッセージ
 NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
-        ; Same ERROR message as above but sent to user WiZ on the other server.
+		; 上記と同じ ERROR メッセージが、相手サーバーのユーザー WiZ に送信されます。
 ```
 
 ## 5. OPTIONALS
