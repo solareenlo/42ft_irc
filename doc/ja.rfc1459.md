@@ -1426,7 +1426,7 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
        - 指定されたサーバ名が現在存在しないことを示すために使用されます．
 403    ERR_NOSUCHCHANNEL
            "<channel name> :No such channel"
-	   - 与えられたチャネル名が無効であることを示すために使用されます．
+       - 与えられたチャネル名が無効であることを示すために使用されます．
 404    ERR_CANNOTSENDTOCHAN
            "<channel name> :Cannot send to channel"
        - (a) モード +n が設定されているチャネルにいない，または (b) モード +m が設定されているチャネルのチャノップ (またはモード +v) でないユーザが，そのチャネルに PRIVMSG メッセージを送信しようとしたときに送信されます．
@@ -1450,7 +1450,8 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            "<mask> :No toplevel domain specified"
 414    ERR_WILDTOPLEVEL
            "<mask> :Wildcard in toplevel domain"
-       - 412 - 414は，何らかの理由でメッセージが届かなかったことを示すために PRIVMSG が返すものです．ERR_NOTOPLEVEL と ERR_WILDTOPLEVEL は "PRIVMSG $<server>" または "PRIVMSG #<host>" を不正に使用しようとしたときに返されるエラーです．
+       - 412 - 414は，何らかの理由でメッセージが届かなかったことを示すために PRIVMSG が返すものです．
+         ERR_NOTOPLEVEL と ERR_WILDTOPLEVEL は "PRIVMSG $<server>" または "PRIVMSG #<host>" を不正に使用しようとしたときに返されるエラーです．
 421    ERR_UNKNOWNCOMMAND
            "<command> :Unknown command"
        - 送信されたコマンドがサーバによって不明であることを示すために，登録されたクライアントに返されます．
@@ -1468,7 +1469,8 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
        - コマンドに期待したニックネームパラメータが見つからなかった場合に返されます．
 432    ERR_ERRONEUSNICKNAME
            "<nick> :Erroneus nickname"
-       - 定義された文字セットに該当しない文字を含む NICK メッセージを受信した後に返されます．有効なニックネームの詳細については，セクションx.x.xを参照してください．
+       - 定義された文字セットに該当しない文字を含む NICK メッセージを受信した後に返されます．
+         有効なニックネームの詳細については，セクションx.x.xを参照してください．
 433    ERR_NICKNAMEINUSE
            "<nick> :Nickname is already in use"
        - NICK メッセージが処理された結果，現在存在するニックネームを変更しようとしたときに返されます．
@@ -1477,7 +1479,6 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
        - ニックネームの衝突（他のサーバによってすでに存在するNICKの登録）を検出したときにサーバからクライアントに返されます．
 441    ERR_USERNOTINCHANNEL
            "<nick> <channel> :They aren’t on that channel"
-       - Returned by the server to indicate that the target user of the command is not on the given channel.
        - コマンドのターゲットユーザが指定されたチャネルにいないことを示すために，サーバから返されます．
 442    ERR_NOTONCHANNEL
            "<channel> :You’re not on that channel"
@@ -1550,19 +1551,24 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            Dummy reply number. Not used.
 302    RPL_USERHOST
            ":[<reply>{<space><reply>}]"
-       - Reply format used by USERHOST to list replies to the query list. The reply string is composed as follows:
+       - USERHOST がクエリリストの返信を一覧表示するために使用する返信フォーマットです．
+         返信文字列は以下のように構成されます．
        <reply> ::= <nick>[’*’] ’=’ <’+’|’-’><hostname>
-       The ’*’ indicates whether the client has registered as an Operator. The ’-’ or ’+’ characters represent whether the client has set an AWAY message or not respectively.
+         ’*’ は，クライアントがオペレータとして登録されているかどうかを示す．
+         ’-’ または ’+’ は，それぞれクライアントが AWAY メッセージを設定しているか否かを表す．
 303    RPL_ISON
            ":[<nick> {<space><nick>}]"
-       - Reply format used by ISON to list replies to the query list.
+       - ISON が問い合わせリストに対する返信を一覧表示するために使用する返信フォーマット．
 301    RPL_AWAY
            "<nick> :<away message>"
 305    RPL_UNAWAY
            ":You are no longer marked as being away"
 306    RPL_NOWAWAY
            ":You have been marked as being away"
-       - These replies are used with the AWAY command (if allowed). RPL_AWAY is sent to any client sending a PRIVMSG to a client which is away. RPL_AWAY is only sent by the server to which the client is connected.  Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the client removes and sets an AWAY message.
+       - これらの応答は，AWAY コマンドと一緒に使用されます（許可されている場合）．
+         RPL_AWAY は，離席しているクライアントに PRIVMSG を送信するすべてのクライアントに送信されます．
+         RPL_AWAY は，クライアントが接続されているサーバによってのみ送信されます．
+         応答 RPL_UNAWAY と RPL_NOWAWAY は，クライアントが AWAY メッセージを削除して設定するときに送信されます．
 311    RPL_WHOISUSER
            "<nick> <user> <host> * :<real name>"
 312    RPL_WHOISSERVER
@@ -1575,78 +1581,97 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            "<nick> :End of /WHOIS list"
 319    RPL_WHOISCHANNELS
            "<nick> :{[@|+]<channel><space>}"
-       - Replies 311 - 313, 317 - 319 are all replies generated in response to a WHOIS message. Given that there are enough parameters present, the answering server must either formulate a reply out of the above numerics (if the query nick is found) or return an error reply. The ’*’ in RPL_WHOISUSER is there as the literal character and not as a wild card. For each reply set, only RPL_WHOISCHANNELS may appear more than once (for long lists of channel names).  The ’@’ and ’+’ characters next to the channel name indicate whether a client is a channel operator or has been granted permission to speak on a moderated channel. The RPL_ENDOFWHOIS reply is used to mark the end of processing a WHOIS message.
+       - 返信 311 - 313, 317 - 319 は，すべて WHOIS メッセージに応答して生成される返信です．
+         十分な数のパラメータが存在する場合，応答サーバは上記の数値から応答を作成するか（クエリニックが見つかった場合），エラー応答を返す必要があります．
+         RPL_WHOISUSER の ’*’ は，ワイルドカードとしてではなく，リテラル文字として存在します．
+         各返事セットについて，RPL_WHOISCHANNELS だけが複数回現れるかもしれません(チャネル名の長いリストの場合)．
+         チャネル名の横にある ’@’ と ’+’ の文字は，クライアントがチャネルオペレータであるか，モデレートされたチャネルで発言する許可を得ているかどうかを示します．
+         RPL_ENDOFWHOIS 応答は，WHOIS メッセージの処理の終了をマークするために使用されます．
 314    RPL_WHOWASUSER
            "<nick> <user> <host> * :<real name>"
 369    RPL_ENDOFWHOWAS
            "<nick> :End of WHOWAS"
-       - When replying to a WHOWAS message, a server must use the replies RPL_WHOWASUSER, RPL_WHOISSERVER or ERR_WASNOSUCHNICK for each nickname in the presented list. At the end of all reply batches, there must be RPL_ENDOFWHOWAS (even if there was only one reply and it was an error).
+       - WHOWAS メッセージに返信するとき，サーバは提示されたリストの各ニックネームに対してRPL_WHOWASUSER，RPL_WHOISSERVER または ERR_WASNOSUCHNICK の返信を使用しなければなりません．
+         すべてのリプライバッチの終わりに，RPL_ENDOFWHOWAS がなければなりません（リプライが1つだけで，それがエラーであったとしても）．
 321    RPL_LISTSTART
            "Channel :Users Name"
 322    RPL_LIST
            "<channel> <# visible> :<topic>"
 323    RPL_LISTEND
            ":End of /LIST"
-       - Replies RPL_LISTSTART, RPL_LIST, RPL_LISTEND mark the start, actual replies with data and end of the server’s response to a LIST command. If there are no channels available to return, only the start and end reply must be sent.
+       - 返信 RPL_LISTSTART，RPL_LIST，RPL_LISTEND は，LIST コマンドに対するサーバの応答の開始，実際のデータによる返信，終了をマークします．
+         返送可能なチャネルがない場合，開始と終了のリプライのみを送信する必要があります．
 324    RPL_CHANNELMODEIS
            "<channel> <mode> <mode params>"
 331    RPL_NOTOPIC
            "<channel> :No topic is set"
 332    RPL_TOPIC
            "<channel> :<topic>"
-       - When sending a TOPIC message to determine the channel topic, one of two replies is sent. If the topic is set, RPL_TOPIC is sent back else RPL_NOTOPIC.
+       - チャネルのトピックを決定する TOPIC メッセージを送信する場合，2 つの返信のうち 1 つを送信します．
+         トピックが設定されていれば，RPL_TOPIC が返送され，そうでなければ RPL_NOTOPIC が返送されます．
 341    RPL_INVITING
            "<channel> <nick>"
-       - Returned by the server to indicate that the attempted INVITE message was successful and is being passed onto the end client.
+       - 試行された INVITE メッセージが成功し，エンドクライアントに渡されることを示すためにサーバから返されます．
 342    RPL_SUMMONING
            "<user> :Summoning user to IRC"
        - Returned by a server answering a SUMMON message to indicate that it is summoning that user.
+       - SUMMON メッセージに応答したサーバが，そのユーザを呼び出していることを示すために返されます．
 351    RPL_VERSION
            "<version>.<debuglevel> <server> :<comments>"
-       - Reply by the server showing its version details.  The <version> is the version of the software being used (including any patchlevel revisions) and the <debuglevel> is used to indicate if the server is running in "debug mode".
-       The "comments" field may contain any comments about the version or further version details.
+       - サーバがそのバージョンの詳細を示す返信です．
+         <version> は使用中のソフトウェアのバージョン（パッチレベルリビジョンを含む），<debuglevel> はサーバが"デバッグモード"で動作しているかどうかを示すために使用されます．
+         "コメント欄"には，バージョンに関するコメントや，さらなるバージョンに関する詳細情報を入力することができます．
 352    RPL_WHOREPLY
            "<channel> <user> <host> <server> <nick> \
            <H|G>[*][@|+] :<hopcount> <real name>"
 315    RPL_ENDOFWHO
            "<name> :End of /WHO list"
-       - The RPL_WHOREPLY and RPL_ENDOFWHO pair are used to answer a WHO message. The RPL_WHOREPLY is only sent if there is an appropriate match to the WHO query. If there is a list of parameters supplied with a WHO message, a RPL_ENDOFWHO must be sent after processing each list item with <name> being the item.
+       - RPL_WHOREPLY と RPL_ENDOFWHO のペアは，WHO メッセージに答えるために使用されます．
+         RPL_WHOREPLY は，WHO クエリに適切なマッチがある場合にのみ送信されます．
+         WHO メッセージで供給されるパラメータのリストがある場合，<name> を項目とする各リスト項目を処理した後に RPL_ENDOFWHO を送信する必要があります．
 353    RPL_NAMREPLY
            "<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
 366    RPL_ENDOFNAMES
            "<channel> :End of /NAMES list"
-       - To reply to a NAMES message, a reply pair consisting of RPL_NAMREPLY and RPL_ENDOFNAMES is sent by the server back to the client. If there is no channel found as in the query, then only RPL_ENDOFNAMES is returned. The exception to this is when a NAMES message is sent with no parameters and all visible channels and contents are sent back in a series of RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark the end.
+       - NAMES メッセージに返信するために，RPL_NAMREPLY と RPL_ENDOFNAMES からなる返信ペアがサーバからクライアントに返送されます．
+         クエリのように見つかったチャネルがない場合，RPL_ENDOFNAMES だけが返されます．
+         この例外は，NAMES メッセージがパラメータなしで送信され，すべての可視チャネルとコンテンツが一連の RPL_NAMEREPLY メッセージで送り返され，RPL_ENDOFNAMES で終了をマークする場合です．
 364    RPL_LINKS
            "<mask> <server> :<hopcount> <server info>"
 365    RPL_ENDOFLINKS
            "<mask> :End of /LINKS list"
-       - In replying to the LINKS message, a server must send replies back using the RPL_LINKS numeric and mark the end of the list using an RPL_ENDOFLINKS reply.
+       - LINKS メッセージに返信する際，サーバは RPL_LINKS 数値を使用して返信を送り，RPL_ENDOFLINKS 返信を使用してリストの終わりをマークしなければなりません．
 367    RPL_BANLIST
            "<channel> <banid>"
 368    RPL_ENDOFBANLIST
            "<channel> :End of channel ban list"
-       - When listing the active ’bans’ for a given channel, a server is required to send the list back using the RPL_BANLIST and RPL_ENDOFBANLIST messages. A separate RPL_BANLIST is sent for each active banid. After the banids have been listed (or if none present) a RPL_ENDOFBANLIST must be sent.
+       - 特定のチャネルのアクティブな’バン’をリストアップする場合，サーバは RPL_BANLIST と RPL_ENDOFBANLIST メッセージを使用してリストを送り返すことが要求されます．
+         アクティブな BANID ごとに個別の RPL_BANLIST が送信されます．
+         banids がリストアップされた後（または1つも存在しない場合），RPL_ENDOFBANLIST を送信する必要があります．
 371    RPL_INFO
            ":<string>"
 374    RPL_ENDOFINFO
            ":End of /INFO list"
-       - A server responding to an INFO message is required to send all its ’info’ in a series of RPL_INFO messages with a RPL_ENDOFINFO reply to indicate the end of the replies.
+       - INFO メッセージに応答するサーバは，そのすべての ’info’ を一連の RPL_INFO メッセージで送信し，返信の終わりを示すために RPL_ENDOFINFO 返信をすることが要求されます．
 375    RPL_MOTDSTART
            ":- <server> Message of the day - "
 372    RPL_MOTD
            ":- <text>"
 376    RPL_ENDOFMOTD
            ":End of /MOTD command"
-       - When responding to the MOTD message and the MOTD file is found, the file is displayed line by line, with each line no longer than 80 characters, using RPL_MOTD format replies. These should be surrounded by a RPL_MOTDSTART (before the RPL_MOTDs) and an RPL_ENDOFMOTD (after).
+       - MOTD メッセージに応答し，MOTD ファイルが見つかった場合，RPL_MOTD 形式の返信で，1行80文字以内でファイルを表示します．
+         これらは RPL_MOTDSTART（RPL_MOTD の前）と RPL_ENDOFMOTD（後）で囲む必要があります．
 381    RPL_YOUREOPER
            ":You are now an IRC operator"
-       - RPL_YOUREOPER is sent back to a client which has just successfully issued an OPER message and gained operator status.
+       - RPL_YOUREOPER は，OPER メッセージを正常に発行し，オペレータ・ステータスを得たばかりのクライアントに返送されます．
 382    RPL_REHASHING
            "<config file> :Rehashing"
-       - If the REHASH option is used and an operator sends a REHASH message, an RPL_REHASHING is sent back to the operator.
+       - REHASH オプションが使用され，オペレータが REHASH メッセージを送信する場合，RPL_REHASHING がオペレータに返送されます．
 391    RPL_TIME
            "<server> :<string showing server’s local time>"
-       - When replying to the TIME message, a server must send the reply using the RPL_TIME format above. The string showing the time need only contain the correct day and time there. There is no further requirement for the time string.
+       - TIME メッセージに返信する場合，サーバは上記の RPL_TIME 形式を使用して返信を送信する必要があります．
+         時刻を示す文字列は，そこに正しい曜日と時刻を含むだけでよいです．
+         時刻を示す文字列には，それ以上の要件はありません．
 392    RPL_USERSSTART
            ":UserID Terminal Host"
 393    RPL_USERS
@@ -1655,7 +1680,9 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            ":End of users"
 395    RPL_NOUSERS
            ":Nobody logged in"
-       - If the USERS message is handled by a server, the replies RPL_USERSTART, RPL_USERS, RPL_ENDOFUSERS and RPL_NOUSERS are used. RPL_USERSSTART must be sent first, following by either a sequence of RPL_USERS or a single RPL_NOUSER. Following this is RPL_ENDOFUSERS.
+       - USERS メッセージがサーバによって処理される場合，応答 RPL_USERSTART，RPL_USERS，RPL_ENDOFUSERS，RPL_NOUSERS が使用されます．
+         RPL_USERSSTART を最初に送信し，その後に一連の RPL_USERS または単一の RPL_NOUSER のいずれかを送信する必要があります．
+         これに続くのは RPL_ENDOFUSERS です．
 200    RPL_TRACELINK
            "Link <version & debug level> <destination> <next server>"
 201    RPL_TRACECONNECTING
@@ -1674,7 +1701,13 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            "<newtype> 0 <client name>"
 261    RPL_TRACELOG
            "File <logfile> <debug level>"
-       - The RPL_TRACE* are all returned by the server in response to the TRACE message. How many are returned is dependent on the the TRACE message and whether it was sent by an operator or not. There is no predefined order for which occurs first.  Replies RPL_TRACEUNKNOWN, RPL_TRACECONNECTING and RPL_TRACEHANDSHAKE are all used for connections which have not been fully established and are either unknown, still attempting to connect or in the process of completing the ’server handshake’.  RPL_TRACELINK is sent by any server which handles a TRACE message and has to pass it on to another server. The list of RPL_TRACELINKs sent in response to a TRACE command traversing the IRC network should reflect the actual connectivity of the servers themselves along that path.  RPL_TRACENEWTYPE is to be used for any connection which does not fit in the other categories but is being displayed anyway.
+       - RPL_TRACE* は，すべて TRACE メッセージに応答してサーバから返されます．
+         いくつ返されるかは，TRACE メッセージとそれがオペレータによって送信されたかどうかに依存します．
+         どちらが先に発生するか，あらかじめ定義された順序はありません．
+         応答 RPL_TRACEUNKNOWN，RPL_TRACECONNECTING，RPL_TRACEHANDSHAKE はすべて，完全に確立されていない接続，不明，まだ接続しようとしている，または’サーバハンドシェイク’の完了プロセスのいずれかに使用されるものです．
+         RPL_TRACELINK は，TRACE メッセージを処理し，それを別のサーバに渡す必要があるすべてのサーバによって送信されます．
+         IRC ネットワークを横断する TRACE コマンドに応答して送信される RPL_TRACELINK のリストは，そのパスに沿ったサーバ自身の実際の接続性を反映する必要があります．
+         RPL_TRACENEWTYPE は，他のカテゴリに当てはまらないが，とにかく表示されている接続に使用されるものです．
 211    RPL_STATSLINKINFO
            "<linkname> <sendq> <sent messages> <sent bytes> <received messages> <received bytes> <time open>"
 212    RPL_STATSCOMMANDS
@@ -1701,7 +1734,7 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            "H <hostmask> * <servername>"
 221    RPL_UMODEIS
            "<user mode string>"
-       - To answer a query about a client’s own mode, RPL_UMODEIS is sent back.
+       - クライアント自身のモードに関する問い合わせに答えるために，RPL_UMODEIS が返送されます．
 251    RPL_LUSERCLIENT
            ":There are <integer> users and <integer> invisible on <integer> servers"
 252    RPL_LUSEROP
@@ -1712,7 +1745,9 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            "<integer> :channels formed"
 255    RPL_LUSERME
            ":I have <integer> clients and <integer> servers"
-       - In processing an LUSERS message, the server sends a set of replies from RPL_LUSERCLIENT, RPL_LUSEROP, RPL_USERUNKNOWN, RPL_LUSERCHANNELS and RPL_LUSERME. When replying, a server must send back RPL_LUSERCLIENT and RPL_LUSERME. The other replies are only sent back if a non-zero count is found for them.
+       - LUSERS メッセージの処理では，サーバは RPL_LUSERCLIENT，RPL_LUSEROP，RPL_USERUNKNOWN，RPL_LUSERCHANNELSおよびRPL_LUSERMEから一式の応答を送信します．
+         返信するとき，サーバは RPL_LUSERCLIENT と RPL_LUSERME を送り返さなければなりません．
+         他の返信は，それらにゼロでないカウントが見つかった場合にのみ送り返されます．
 256    RPL_ADMINME
            "<server> :Administrative info"
 257    RPL_ADMINLOC1
@@ -1721,7 +1756,8 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
            ":<admin info>"
 259    RPL_ADMINEMAIL
            ":<admin info>"
-       - When replying to an ADMIN message, a server is expected to use replies RLP_ADMINME through to RPL_ADMINEMAIL and provide a text message with each. For RPL_ADMINLOC1 a description of what city, state and country the server is in is expected, followed by details of the university and department (RPL_ADMINLOC2) and finally the administrative contact for the server (an email address here is required) in RPL_ADMINEMAIL.
+       - ADMIN メッセージに返信する場合，サーバは RLP_ADMINME から RPL_ADMINEMAIL までの返信を使用し，それぞれテキストメッセージを提供することが期待されています．
+         RPL_ADMINLOC1 には，サーバがある都市，州，国の説明が期待され，次に大学と学科の詳細（RPL_ADMINLOC2），最後に RPL_ADMINEMAIL にサーバの管理連絡先（ここに電子メールアドレスが必要です）が求められます．
 ```
 
 ### 6.3 Reserved numerics.
