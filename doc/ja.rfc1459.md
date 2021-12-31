@@ -1371,7 +1371,7 @@ Examples:
 ```
 :csd.bu.edu WALLOPS :Connect ’*.uiuc.edu 6667’ from Joshua
         ; WALLOPS message from csd.bu.edu announcing a CONNECT message it received and acted upon from Joshua.
-		; csd.bu.edu からの WALLOPS メッセージは，Joshua から受信し対応した CONNECT メッセージを知らせています．
+        ; csd.bu.edu からの WALLOPS メッセージは，Joshua から受信し対応した CONNECT メッセージを知らせています．
 ```
 
 ### 5.7 Userhost message
@@ -1390,7 +1390,7 @@ Numeric Replies:
 Examples:
 ```
 USERHOST Wiz Michael Marty p
-		; ニックネーム "Wiz", "Michael", "Marty", "p" の情報に関する USERHOST リクエスト．
+        ; ニックネーム "Wiz", "Michael", "Marty", "p" の情報に関する USERHOST リクエスト．
 ```
 
 ### 5.8 Ison message
@@ -1414,134 +1414,136 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
 ```
 
 ## 6. REPLIES
-The following is a list of numeric replies which are generated in response to the commands given above. Each numeric is given with its number, name and reply string.
+以下は、上記のコマンドに応答して生成される数値応答のリストです。各数値は、番号、名前、返信文字列で示されます。
 
 ### 6.1 Error Replies.
-```
 401    ERR_NOSUCHNICK
-           "<nickname> :No such nick/channel"
-       - Used to indicate the nickname parameter supplied to a command is currently unused.
+           "\<nickname\> :No such nick/channel"
+       - コマンドに与えられたニックネームパラメータが現在未使用であることを示すために使用されます。
 402    ERR_NOSUCHSERVER
-           "<server name> :No such server"
-       - Used to indicate the server name given currently doesn’t exist.
+           "\<server name\> :No such server"
+       - 指定されたサーバー名が現在存在しないことを示すために使用されます。
+
 403    ERR_NOSUCHCHANNEL
-           "<channel name> :No such channel"
-       - Used to indicate the given channel name is invalid.
+           "\<channel name\> :No such channel"
+	   - 与えられたチャンネル名が無効であることを示すために使用されます。
 404    ERR_CANNOTSENDTOCHAN
-           "<channel name> :Cannot send to channel"
-       - Sent to a user who is either (a) not on a channel which is mode +n or (b) not a chanop (or mode +v) on a channel which has mode +m set and is trying to send a PRIVMSG message to that channel.
+           "\<channel name\> :Cannot send to channel"
+       - (a) モード +n が設定されているチャネルにいない、または (b) モード +m が設定されているチャネルのチャノップ (またはモード +v) でないユーザが、そのチャネルに PRIVMSG メッセージを送信しようとしたときに送信されます。
+
 405    ERR_TOOMANYCHANNELS
-           "<channel name> :You have joined too many channels"
-       - Sent to a user when they have joined the maximum number of allowed channels and they try to join another channel.
+           "\<channel name\> :You have joined too many channels"
+       - ユーザーが許可された最大数のチャンネルに参加し、別のチャンネルに参加しようとしたときに送信されます。
 406    ERR_WASNOSUCHNICK
-           "<nickname> :There was no such nickname"
-       - Returned by WHOWAS to indicate there is no history information for that nickname.
+           "\<nickname\> :There was no such nickname"
+       - WHOWAS により、そのニックネームの履歴情報がないことを示すために返されます。
+
 407    ERR_TOOMANYTARGETS
-           "<target> :Duplicate recipients. No message delivered"
-       - Returned to a client which is attempting to send a PRIVMSG/NOTICE using the user@host destination format and for a user@host which has several occurrences.
+           "\<target\> :Duplicate recipients. No message delivered"
+       - PRIVMSG/NOTICE を user@host の宛先フォーマットで、user@host が複数存在する場合に送信しようとしたクライアントに返されます。
 409    ERR_NOORIGIN
            ":No origin specified"
-       - PING or PONG message missing the originator parameter which is required since these commands must work without valid prefixes.
+       - PING または PONG メッセージに originator パラメータがない。これらのコマンドは有効な接頭辞がないと動作しないため、必須です。
 411    ERR_NORECIPIENT
-           ":No recipient given (<command>)"
+           ":No recipient given (\<command\>)"
 412    ERR_NOTEXTTOSEND
            ":No text to send"
 413    ERR_NOTOPLEVEL
-           "<mask> :No toplevel domain specified"
+           "\<mask\> :No toplevel domain specified"
 414    ERR_WILDTOPLEVEL
-           "<mask> :Wildcard in toplevel domain"
-       - 412 - 414 are returned by PRIVMSG to indicate that the message wasn’t delivered for some reason.  ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that are returned when an invalid use of "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
+           "\<mask\> :Wildcard in toplevel domain"
+       - 412 - 414は、何らかの理由でメッセージが届かなかったことを示すために PRIVMSG が返すものです。ERR_NOTOPLEVEL と ERR_WILDTOPLEVEL は "PRIVMSG $\<server\>" または "PRIVMSG #\<host\>" を不正に使用しようとしたときに返されるエラーです。
 421    ERR_UNKNOWNCOMMAND
-           "<command> :Unknown command"
-       - Returned to a registered client to indicate that the command sent is unknown by the server.
+           "\<command\> :Unknown command"
+       - 送信されたコマンドがサーバーによって不明であることを示すために、登録されたクライアントに返されます。
 422    ERR_NOMOTD
            ":MOTD File is missing"
-       - Server’s MOTD file could not be opened by the server.
+       - サーバーの MOTD ファイルを開くことができませんでした。
 423    ERR_NOADMININFO
-           "<server> :No administrative info available"
-       - Returned by a server in response to an ADMIN message when there is an error in finding the appropriate information.
+           "\<server\> :No administrative info available"
+       - ADMIN メッセージの応答として、適切な情報の検索に失敗した場合にサーバーから返されます。
 424    ERR_FILEERROR
-           ":File error doing <file op> on <file>"
-       - Generic error message used to report a failed file operation during the processing of a message.
+           ":File error doing \<file op\> on \<file\>"
+       - メッセージの処理中にファイル操作の失敗を報告するために使用される一般的なエラーメッセージです。
 431    ERR_NONICKNAMEGIVEN
            ":No nickname given"
-       - Returned when a nickname parameter expected for a command and isn’t found.
+       - コマンドに期待したニックネームパラメータが見つからなかった場合に返されます。
 432    ERR_ERRONEUSNICKNAME
-           "<nick> :Erroneus nickname"
-       - Returned after receiving a NICK message which contains characters which do not fall in the defined set. See section x.x.x for details on valid nicknames.
+           "\<nick\> :Erroneus nickname"
+       - 定義された文字セットに該当しない文字を含む NICK メッセージを受信した後に返されます。有効なニックネームの詳細については、セクションx.x.xを参照してください。
 433    ERR_NICKNAMEINUSE
-           "<nick> :Nickname is already in use"
-       - Returned when a NICK message is processed that results in an attempt to change to a currently existing nickname.
+           "\<nick\> :Nickname is already in use"
+       - NICK メッセージが処理された結果、現在存在するニックネームを変更しようとしたときに返されます。
 436    ERR_NICKCOLLISION
-           "<nick> :Nickname collision KILL"
-       - Returned by a server to a client when it detects a nickname collision (registered of a NICK that already exists by another server).
+           "\<nick\> :Nickname collision KILL"
+       - ニックネームの衝突（他のサーバーによってすでに存在するNICKの登録）を検出したときにサーバーからクライアントに返されます。
 441    ERR_USERNOTINCHANNEL
-           "<nick> <channel> :They aren’t on that channel"
+           "\<nick\> \<channel\> :They aren’t on that channel"
        - Returned by the server to indicate that the target user of the command is not on the given channel.
+       - コマンドのターゲットユーザーが指定されたチャンネルにいないことを示すために、サーバーから返されます。
 442    ERR_NOTONCHANNEL
-           "<channel> :You’re not on that channel"
-       - Returned by the server whenever a client tries to perform a channel effecting command for which the client isn’t a member.
+           "\<channel\> :You’re not on that channel"
+       - クライアントがメンバーでないチャネルに影響を与えるコマンドを実行しようとしたときに、サーバーから返されます。
 443    ERR_USERONCHANNEL
-           "<user> <channel> :is already on channel"
-       - Returned when a client tries to invite a user to a channel they are already on.
+           "\<user\> \<channel\> :is already on channel"
+       - クライアントが、ユーザーが既に参加しているチャンネルに招待しようとしたときに返されます。
 444    ERR_NOLOGIN
-           "<user> :User not logged in"
-       - Returned by the summon after a SUMMON command for a user was unable to be performed since they were not logged in.
+           "\<user\> :User not logged in"
+       - あるユーザーに対する SUMMON コマンドがログインしていないために実行できなかった場合に、summon から返されます。
 445    ERR_SUMMONDISABLED
            ":SUMMON has been disabled"
-       - Returned as a response to the SUMMON command. Must be returned by any server which does not implement it.
+       - SUMMON コマンドの応答として返されます。これを実装していないサーバーは必ず返さなければなりません。
 446    ERR_USERSDISABLED
            ":USERS has been disabled"
-       - Returned as a response to the USERS command. Must be returned by any server which does not implement it.
+       - USERS コマンドの応答として返されます。これを実装していないサーバーは必ず返さなければなりません。
 451    ERR_NOTREGISTERED
            ":You have not registered"
-       - Returned by the server to indicate that the client must be registered before the server will allow it to be parsed in detail.
+       - サーバーが返す値で、サーバーが詳細な解析を許可する前にクライアントを登録する必要があることを示す。
 461    ERR_NEEDMOREPARAMS
-           "<command> :Not enough parameters"
-       - Returned by the server by numerous commands to indicate to the client that it didn’t supply enough parameters.
+           "\<command\> :Not enough parameters"
+       - サーバーが多数のコマンドで返すもので、クライアントに十分なパラメータが供給されていないことを示す。
 462    ERR_ALREADYREGISTRED
            ":You may not reregister"
-       - Returned by the server to any link which tries to change part of the registered details (such as password or user details from second USER message).
+       - 登録された情報の一部（パスワードや USER メッセージの2番目のユーザー情報など）を変更しようとするリンクに対して、サーバーから返されます。
 463    ERR_NOPERMFORHOST
            ":Your host isn’t among the privileged"
-       - Returned to a client which attempts to register with a server which does not been setup to allow connections from the host the attempted connection is tried.
+       - 接続しようとしたホストからの接続を許可するように設定されていないサーバーに登録しようとしたクライアントに返されます。
 464    ERR_PASSWDMISMATCH
            ":Password incorrect"
-       - Returned to indicate a failed attempt at registering a connection for which a password was required and was either not given or incorrect.
+       - パスワードが要求された接続の登録に失敗したことを示すために返されるもので、パスワードが与えられなかったか、不正確であったためです。
 465    ERR_YOUREBANNEDCREEP
            ":You are banned from this server"
-       - Returned after an attempt to connect and register yourself with a server which has been setup to explicitly deny connections to you.
+       - 接続を明示的に拒否するように設定されたサーバーに接続し、自分自身を登録しようとした後に返されます。
 467    ERR_KEYSET
-           "<channel> :Channel key already set"
+           "\<channel\> :Channel key already set"
 471    ERR_CHANNELISFULL
-           "<channel> :Cannot join channel (+l)"
+           "\<channel\> :Cannot join channel (+l)"
 472    ERR_UNKNOWNMODE
-           "<char> :is unknown mode char to me"
+           "\<char\> :is unknown mode char to me"
 473    ERR_INVITEONLYCHAN
-           "<channel> :Cannot join channel (+i)"
+           "\<channel\> :Cannot join channel (+i)"
 474    ERR_BANNEDFROMCHAN
-           "<channel> :Cannot join channel (+b)"
+           "\<channel\> :Cannot join channel (+b)"
 475    ERR_BADCHANNELKEY
-           "<channel> :Cannot join channel (+k)"
+           "\<channel\> :Cannot join channel (+k)"
 481    ERR_NOPRIVILEGES
            ":Permission Denied- You’re not an IRC operator"
-       - Any command requiring operator privileges to operate must return this error to indicate the attempt was unsuccessful.
+       - 操作にオペレーター権限が必要なコマンドは、試行に失敗したことを示すためにこのエラーを返さなければなりません．
 482    ERR_CHANOPRIVSNEEDED
-           "<channel> :You’re not channel operator"
-       - Any command requiring ’chanop’ privileges (such as MODE messages) must return this error if the client making the attempt is not a chanop on the specified channel.
+           "\<channel\> :You’re not channel operator"
+       - chanop 権限を必要とするコマンド（MODEメッセージなど）は、試行するクライアントが指定されたチャネルの chanop でない場合、このエラーを返さなければなりません。
 483    ERR_CANTKILLSERVER
            ":You cant kill a server!"
-       - Any attempts to use the KILL command on a server are to be refused and this error returned directly to the client.
+       - サーバー上で KILL コマンドを使用しようとすると、拒否され、このエラーが直接クライアントに返されます。
 491    ERR_NOOPERHOST
            ":No O-lines for your host"
-       - If a client sends an OPER message and the server has not been configured to allow connections from the client’s host as an operator, this error must be returned.
+       - クライアントが OPER メッセージを送信し、サーバがクライアントのホストからの接続をオペレータとして許可するように設定されていない場合、このエラーを返さなければなりません。
 501    ERR_UMODEUNKNOWNFLAG
            ":Unknown MODE flag"
-       - Returned by the server to indicate that a MODE message was sent with a nickname parameter and that the a mode flag sent was not recognized.
+       - ニックネームパラメータを持つ MODE メッセージが送信され、送信されたモードフラグが認識されなかったことを示すためにサーバによって返されます。
 502    ERR_USERSDONTMATCH
            ":Cant change mode for other users"
-       - Error sent to any user trying to view or change the user mode for a user other than themselves.
-```
+       - 自分以外のユーザーのユーザーモードを表示または変更しようとしたユーザーに送られるエラー。
 
 ### 6.2 Command responses.
 ```
