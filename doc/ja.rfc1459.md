@@ -1418,17 +1418,27 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
 
 ### 6.1 Error Replies.
 401    ERR_NOSUCHNICK
+
            "\<nickname\> :No such nick/channel"
+
        - コマンドに与えられたニックネームパラメータが現在未使用であることを示すために使用されます。
+
 402    ERR_NOSUCHSERVER
+
            "\<server name\> :No such server"
+
        - 指定されたサーバー名が現在存在しないことを示すために使用されます。
 
 403    ERR_NOSUCHCHANNEL
+
            "\<channel name\> :No such channel"
+
 	   - 与えられたチャンネル名が無効であることを示すために使用されます。
+
 404    ERR_CANNOTSENDTOCHAN
+
            "\<channel name\> :Cannot send to channel"
+
        - (a) モード +n が設定されているチャネルにいない、または (b) モード +m が設定されているチャネルのチャノップ (またはモード +v) でないユーザが、そのチャネルに PRIVMSG メッセージを送信しようとしたときに送信されます。
 
 405    ERR_TOOMANYCHANNELS
