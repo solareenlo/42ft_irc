@@ -672,7 +672,7 @@ MODE #Finnish +o Kilroy ; チャネル #Finnish で Kilroy に ’chanop’ 権�
 
 MODE #Finnish +v Wiz    ; WiZに #Finnish で発言するのを許可します．
 
-MODE #Fins -s           ; チャネル #Fins から 'secret' フラグを削除します．
+MODE #Fins -s           ; チャネル #Fins から ’secret’ フラグを削除します．
 
 MODE #42 +k oulu        ; チャネルキーを "oulu" に設定します．
 
@@ -725,7 +725,7 @@ Parameters:  [<channel>{,<channel>}]
 
 NAMES コマンドを使用すると，ユーザが見ることのできるチャネルに表示されているすべてのニックネームをリストアップすることができます．表示されるチャネル名は，プライベート (+p) やシークレット (+s) でないもの，または実際に参加しているチャネル名です．パラメータは，有効な場合に情報を返すチャネルを指定します． 不正なチャネル名に対するエラーの返事はありません．
 
-\<channel\> パラメータが与えられない場合，すべてのチャネルとその占有者のリストが返されます．このリストの最後には，表示されているがどのチャネルにも入っていない，または表示されているチャネルに入っていないユーザのリストが 'channel' "\*" に入っているとしてリストアップされます．
+\<channel\> パラメータが与えられない場合，すべてのチャネルとその占有者のリストが返されます．このリストの最後には，表示されているがどのチャネルにも入っていない，または表示されているチャネルに入っていないユーザのリストが ’channel’ "\*" に入っているとしてリストアップされます．
 
 Numerics:
 ```
@@ -1159,7 +1159,7 @@ KILL メッセージは，クライアントとサーバの接続を，実際に
 
 ニックネームは常にグローバルにユニークであることが要求されるため，’重複’（同じニックネームで2人のユーザを登録しようとすること）が検出されるたびにKILLメッセージが送られ，2人とも消えて1人だけが再び現れることが期待されるのです．
 
-コメントには，KILL の実際の理由を反映させる必要があります．サーバが生成した KILL の場合は，通常，2 つの衝突するニックネームの起源に関する詳細が含まれます．ユーザの場合は，それを見た人が満足するような適切な理由を提供するように任されています．KILLer を隠すために偽の KILL が生成されるのを防ぐために，コメントには 'kill-path' が表示され，通過する各サーバによってそのパスが更新され，それぞれのサーバ名が先頭に追加されます．
+コメントには，KILL の実際の理由を反映させる必要があります．サーバが生成した KILL の場合は，通常，2 つの衝突するニックネームの起源に関する詳細が含まれます．ユーザの場合は，それを見た人が満足するような適切な理由を提供するように任されています．KILLer を隠すために偽の KILL が生成されるのを防ぐために，コメントには ’kill-path’ が表示され，通過する各サーバによってそのパスが更新され，それぞれのサーバ名が先頭に追加されます．
 
 Numeric Replies:
 ```
@@ -1241,7 +1241,7 @@ NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
 ```
 
 ## 5. OPTIONALS
-This section describes OPTIONAL messages. They are not required in a working server implementation of the protocol described herein. In the absence of the option, an error reply message must be generated or an unknown command error. If the message is destined for another server to answer then it must be passed on (elementary parsing required) The allocated numerics for this are listed with the messages below.
+このセクションでは，OPTIONAL メッセージについて説明します．これらは，ここで説明するプロトコルの実用的なサーバ実装では必要ありません．オプションがない場合，エラー応答メッセージが生成されるか，未知のコマンドエラーが発生しなければなりません．もしメッセージが他のサーバに応答するよう意図されているなら，それは渡されなければなりません(初歩的なパースが必要です)．このために割り当てられた数値は，以下のメッセージとともにリストされています．
 
 ### 5.1 Away
 ```
@@ -1249,9 +1249,9 @@ Command   :  AWAY
 Parameters:  [message]
 ```
 
-With the AWAY message, clients can set an automatic reply string for any PRIVMSG commands directed at them (not to a channel they are on).  The automatic reply is sent by the server to client sending the PRIVMSG command. The only replying server is the one to which the sending client is connected to.
+AWAY メッセージにより，クライアントは自分宛の PRIVMSG コマンド（自分がいるチャネル宛ではない）に対して，自動返信文字列を設定することができます．自動応答は，PRIVMSG コマンドを送信するクライアントに対してサーバから送信されます．返信するサーバは，送信側クライアントが接続されているサーバのみです．
 
-The AWAY message is used either with one parameter (to set an AWAY message) or with no parameters (to remove the AWAY message).
+AWAY メッセージは1つのパラメータで使用する（AWAY メッセージを設定する）か，パラメータなしで使用する（AWAY メッセージを削除する）かを選択します．
 
 Numeric Replies:
 ```
@@ -1260,8 +1260,8 @@ Numeric Replies:
 
 Examples:
 ```
-AWAY :Gone to lunch. Back in 5    ; set away message to "Gone to lunch.  Back in 5".
-:WiZ AWAY                         ; unmark WiZ as being away.
+AWAY :Gone to lunch. Back in 5    ; AWAY メッセージを "Gone to lunch.  Back in 5" に設定します．
+:WiZ AWAY                         ; WiZ を AWAY としてマーク解除する．
 ```
 
 ### 5.2 Rehash message
@@ -1270,7 +1270,7 @@ Command   :  REHASH
 Parameters:  None
 ```
 
-The rehash message can be used by the operator to force the server to re-read and process its configuration file.
+rehashメッセージは，オペレータがサーバに設定ファイルの再読み込みと処理を強制するために使用することができます．
 
 Numeric Replies:
 ```
@@ -1279,7 +1279,7 @@ Numeric Replies:
 
 Examples:
 ```
-REHASH    ; message from client with operator status to server asking it to reread its configuration file.
+REHASH    ; オペレータの状態を示すクライアントからサーバにメッセージを送信し，サーバに設定ファイルの再読み込みを要求します．
 ```
 
 ### 5.3 Restart message
@@ -1288,9 +1288,9 @@ Command   :  RESTART
 Parameters:  None
 ```
 
-The restart message can only be used by an operator to force a server restart itself. This message is optional since it may be viewed as a risk to allow arbitrary people to connect to a server as an operator and execute this command, causing (at least) a disruption to service.
+RESTART メッセージは，オペレータがサーバ自体を強制的に再起動させるためにのみ使用することができます．任意の人がオペレータとしてサーバに接続してこのコマンドを実行し，（少なくとも）サービスの停止を引き起こすことはリスクとみなされる可能性があるため，このメッセージはオプションとします．
 
-The RESTART command must always be fully processed by the server to which the sending client is connected and not be passed onto other connected servers.
+RESTART コマンドは，常に送信側クライアントが接続しているサーバで完全に処理されなければならず，接続している他のサーバに渡されることはありません．
 
 Numeric Replies:
 ```
@@ -1299,7 +1299,7 @@ Numeric Replies:
 
 Examples:
 ```
-RESTART    ; no parameters required.
+RESTART    ; パラメータは必要ありません．
 ```
 
 ### 5.4 Summon message
@@ -1308,11 +1308,11 @@ Command   :  SUMMON
 Parameters:  <user> [<server>]
 ```
 
-The SUMMON command can be used to give users who are on a host running an IRC server a message asking them to please join IRC. This message is only sent if the target server (a) has SUMMON enabled, (b) the user is logged in and (c) the server process can write to the user’s tty (or similar).
+SUMMON コマンドは，IRC サーバを実行しているホストにいるユーザに，IRC に参加してくださいというメッセージを送るために使用することができます．このメッセージは，ターゲットサーバが (a) SUMMON を有効にしていて， (b) ユーザがログインしていて， (c) サーバプロセスがユーザの tty (または同様のもの) に書き込める場合にのみ送信されます．
 
-If no <server> parameter is given it tries to summon <user> from the server the client is connected to is assumed as the target.
+\<server\> パラメータを指定しない場合，クライアントが接続しているサーバから \<user\> を呼び出そうとするものとします．
 
-If summon is not enabled in a server, it must return the ERR_SUMMONDISABLED numeric and pass the summon message onwards.
+サーバで summon が有効でない場合，ERR_SUMMONDISABLED の数値を返し，summon メッセージを以降に渡さなければなりません．
 
 Numeric Replies:
 ```
@@ -1323,8 +1323,8 @@ Numeric Replies:
 
 Examples:
 ```
-SUMMON jto                   ; summon user jto on the server’s host
-SUMMON jto tolsun.oulu.fi    ; summon user jto on the host which a server named "tolsun.oulu.fi" is running.
+SUMMON jto                   ; サーバのホストでユーザ jto を召喚します．
+SUMMON jto tolsun.oulu.fi    ; "tolsun.ulu.fi" という名前のサーバが稼働しているホストで，ユーザ jto を召喚します．
 ```
 
 ### 5.5 Users
@@ -1333,7 +1333,7 @@ Command   :  USERS
 Parameters:  [<server>]
 ```
 
-The USERS command returns a list of users logged into the server in a similar format to who(1), rusers(1) and finger(1). Some people may disable this command on their server for security related reasons. If disabled, the correct numeric must be returned to indicate this.
+USERS コマンドは，who(1), rusers(1), finger(1) と同様のフォーマットで，サーバにログインしているユーザのリストを返します．人によっては，セキュリティ関連の理由から，サーバ上でこのコマンドを無効にしている場合があります．無効にした場合は，それを示すために正しい数値を返さなければなりません．
 
 Numeric Replies:
 ```
@@ -1350,17 +1350,17 @@ Disabled Reply:
 
 Examples:
 ```
-USERS eff.org                 ; request a list of users logged in on server eff.org
-:John USERS tolsun.oulu.fi    ; request from John for a list of users logged in on server tolsun.oulu.fi
+USERS eff.org                 ; サーバ eff.org にログインしているユーザのリストを要求します．
+:John USERS tolsun.oulu.fi    ; John がサーバ tolsun.oulu.fi にログインしているユーザのリストを要求しています．
 ```
 
 ### 5.6 Operwall message
 ```
 Command   :  WALLOPS
-Parameters:  Text to be sent to all operators currently online
+Parameters:  現在オンライン中の全オペレータに送信されるテキスト
 ```
 
-Sends a message to all operators currently online. After implementing WALLOPS as a user command it was found that it was often and commonly abused as a means of sending a message to a lot of people (much similar to WALL). Due to this it is recommended that the current implementation of WALLOPS be used as an example by allowing and recognising only servers as the senders of WALLOPS.
+現在オンライン中の全オペレータにメッセージを送信します．ユーザコマンドとして WALLOPS を実装した後，それが多くの人にメッセージを送る手段としてしばしば一般的に乱用されることがわかりました（WALL によく似ています）．このため，WALLOPS の現在の実装は，WALLOPS の送信者としてサーバだけを許可し，認識することによって，例として使用されることが推奨されます．
 
 Numeric Replies:
 ```
@@ -1371,6 +1371,7 @@ Examples:
 ```
 :csd.bu.edu WALLOPS :Connect ’*.uiuc.edu 6667’ from Joshua
         ; WALLOPS message from csd.bu.edu announcing a CONNECT message it received and acted upon from Joshua.
+		; csd.bu.edu からの WALLOPS メッセージは，Joshua から受信し対応した CONNECT メッセージを知らせています．
 ```
 
 ### 5.7 Userhost message
@@ -1379,7 +1380,7 @@ Command   :  USERHOST
 Parameters:  <nickname>{<space><nickname>}
 ```
 
-The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. The returned list has each reply separated by a space.
+USERHOST コマンドはスペース文字で区切られた最大5つのニックネームのリストを受け取り，見つけたそれぞれのニックネームに関する情報のリストを返します．返されるリストには，それぞれの返答がスペースで区切られています．
 
 Numeric Replies:
 ```
@@ -1389,7 +1390,7 @@ Numeric Replies:
 Examples:
 ```
 USERHOST Wiz Michael Marty p
-        ;USERHOST request for information on nicks "Wiz", "Michael", "Marty" and "p"
+		; ニックネーム "Wiz", "Michael", "Marty", "p" の情報に関する USERHOST リクエスト．
 ```
 
 ### 5.8 Ison message
@@ -1398,9 +1399,9 @@ Command   :  ISON
 Parameters:  <nickname>{<space><nickname>}
 ```
 
-The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC. ISON only takes one (1) parameter: a space-separated list of nicks. For each nickname in the list that is present, the server adds that to its reply string. Thus the reply string may return empty (none of the given nicks are present), an exact copy of the parameter string (all of them present) or as any other subset of the set of nicks given in the parameter. The only limit on the number of nicks that may be checked is that the combined length must not be too large as to cause the server to chop it off so it fits in 512 characters.
+ISON コマンドは，与えられたニックネームが現在 IRC 上にあるかどうかについての応答を得るための，迅速かつ効率的な手段を提供するために実装されました．ISON はスペースで区切られたニックネームのリストという，たった一つのパラメータを取ります．リスト中のそれぞれのニックネームが存在する場合，サーバはその応答文字列にそのニックネームを追加します．したがって，応答文字列は空 (与えられたニックネームが存在しない)，パラメータ文字列の完全なコピー (すべてのニックネームが存在する)，パラメータで与えられたニックネームのセットの他のサブセットを返すかもしれません．チェックするニックの数に関する唯一の制限は，サーバが512文字に収まるように切り捨てるほど，ニックの合計の長さが大きすぎてはいけないということです．
 
-ISON is only be processed by the server local to the client sending the command and thus not passed onto other servers for further processing.
+ISONは，コマンドを送信したクライアントのローカルサーバでのみ処理されるため，他のサーバに渡されてさらに処理されることはありません．
 
 Numeric Replies:
 ```
@@ -1409,7 +1410,7 @@ Numeric Replies:
 
 Examples:
 ```
-ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; Sample ISON request for 7 nicks.
+ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7つのニックをリクエストしています．
 ```
 
 ## 6. REPLIES
