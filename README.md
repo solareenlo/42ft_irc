@@ -2,12 +2,12 @@
 
 ## Reference
 ### IRC Documentation
-- [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol
-- [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture
-- [RFC2811](https://tools.ietf.org/html/rfc2811): Channel Management
-- [RFC2812](https://tools.ietf.org/html/rfc2812): Client Protocol
-- [RFC2813](https://tools.ietf.org/html/rfc2813): Server Protocol
-- [RFC7194](https://tools.ietf.org/html/rfc7194): Default Port for Internet Relay Chat (IRC) via TLS/SSL
+- [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol ([ja](https://github.com/solareenlo/42ft_irc/blob/main/doc/ja.rfc1459.md))
+- [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture ([ja](https://tex2e.github.io/rfc-translater/html/rfc2810.html))
+- [RFC2811](https://tools.ietf.org/html/rfc2811): Channel Management ([ja](https://tex2e.github.io/rfc-translater/html/rfc2811.html))
+- [RFC2812](https://tools.ietf.org/html/rfc2812): Client Protocol ([ja](https://tex2e.github.io/rfc-translater/html/rfc2812.html))
+- [RFC2813](https://tools.ietf.org/html/rfc2813): Server Protocol ([ja](https://tex2e.github.io/rfc-translater/html/rfc2813.html))
+- [RFC7194](https://tools.ietf.org/html/rfc7194): Default Port for Internet Relay Chat (IRC) via TLS/SSL ([ja](https://tex2e.github.io/rfc-translater/html/rfc7194.html))
 - [RFC952](https://datatracker.ietf.org/doc/html/rfc952): DOD INTERNET HOST TABLE SPECIFICATION
 
 ### Docs
