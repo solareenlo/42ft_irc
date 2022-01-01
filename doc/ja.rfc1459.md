@@ -108,8 +108,8 @@ IRCプロトコルはテキストベースのプロトコルであり，最も�
   * [8.9 Tracking nickname changes](#89-tracking-nickname-changes)
   * [8.10 Flood control of clients](#810-flood-control-of-clients)
   * [8.11 Non-blocking lookups](#811-non-blocking-lookups)
-    + [8.11.1 Hostname (DNS) lookups](#8111-hostname--dns--lookups)
-    + [8.11.2 Username (Ident) lookups](#8112-username--ident--lookups)
+    + [8.11.1 Hostname (DNS) lookups](#8111-hostname-dns-lookups)
+    + [8.11.2 Username (Ident) lookups](#8112-username-ident-lookups)
   * [8.12 Configuration File](#812-configuration-file)
     + [8.12.1 Allowing clients to connect](#8121-allowing-clients-to-connect)
     + [8.12.2 Operators](#8122-operators)
@@ -1877,11 +1877,11 @@ ISON phone trillian WiZ jarlek Avalon Angel Monstah    ; サンプル ISON は7�
 ```
 
 ### 6.3 Reserved numerics.
-These numerics are not described above since they fall into one of the following categories:
+これらの数値は，以下のいずれかに該当するため，上記では説明しません．
 
-1. no longer in use;
-2. reserved for future planned use;
-3. in current use but are part of a non-generic ’feature’ of the current IRC server.
+1. もう使用されていない．
+2. 将来の使用のために予約されている．
+3. 現在使用されているが，現在の IRC サーバの一般的でない’機能’の一部である．
 
 ```
 209    RPL_TRACECLASS         217    RPL_STATSQLINE
@@ -1896,136 +1896,137 @@ These numerics are not described above since they fall into one of the following
 ```
 
 ## 7. Client and server authentication
-Clients and servers are both subject to the same level of authentication. For both, an IP number to hostname lookup (and reverse check on this) is performed for all connections made to the server. Both connections are then subject to a password check (if there is a password set for that connection). These checks are possible on all connections although the password check is only commonly used with servers.
+クライアントもサーバも同じレベルの認証が行われます．両者とも，サーバへのすべての接続について，IP 番号とホスト名のルックアップ（およびこの逆チェック）が実行されます．その後，両方の接続に対してパスワードチェックが行われます (その接続にパスワードが設定されている場合)．これらのチェックはすべての接続で可能ですが，パスワードチェックはサーバでのみ一般的に使用されます．
 
-An additional check that is becoming of more and more common is that of the username responsible for making the connection. Finding the username of the other end of the connection typically involves connecting to an authentication server such as IDENT as described in RFC 1413.
+さらに，最近増えているのが，接続に使用したユーザ名のチェックです．接続の相手側のユーザ名を見つけるには，通常，RFC1413 に記載されている IDENT などの認証サーバに接続する必要があります．
 
-Given that without passwords it is not easy to reliably determine who is on the other end of a network connection, use of passwords is strongly recommended on inter-server connections in addition to any other measures such as using an ident server.
+パスワードがなければ，ネットワーク接続の相手方を確実に特定することは容易ではないため，サーバ間接続では，ID サーバの使用などの対策に加え，パスワードの使用を強く推奨します．
 
 ## 8. Current implementations
-The only current implementation of this protocol is the IRC server, version 2.8. Earlier versions may implement some or all of the commands described by this document with NOTICE messages replacing many of the numeric replies. Unfortunately, due to backward compatibility requirements, the implementation of some parts of this document varies with what is laid out. On notable difference is:
+このプロトコルの現在の実装は，IRCサーバのバージョン2.8のみです．それ以前のバージョンでは，このドキュメントで説明されているコマンドの一部または全部を，数値応答の多くを NOTICE メッセージに置き換えて実装しているかもしれません．残念ながら，後方互換性の要求のために，この文書のいくつかの部分の実装は，レイアウトされたものと異なっています．顕著な違いとしては
 
-* recognition that any LF or CR anywhere in a message marks the end of that message (instead of requiring CR-LF);
+* メッセージ内の任意の LF または CR がそのメッセージの終わりを示すという認識（CR-LFを要求する代わりに）．
 
-The rest of this section deals with issues that are mostly of importance to those who wish to implement a server but some parts also apply directly to clients as well.
+このセクションの残りの部分は，主にサーバを実装しようとする人にとって重要な問題を扱っていますが，いくつかの部分はクライアントにも直接適用されます．
 
 ### 8.1 Network protocol: TCP - why it is best used here.
-IRC has been implemented on top of TCP since TCP supplies a reliable network protocol which is well suited to this scale of conferencing.  The use of multicast IP is an alternative, but it is not widely available or supported at the present time.
+IRC は，TCP がこの規模の会議に適した信頼性の高いネットワークプロトコルを提供しているため，TCP の上に実装されています．マルチキャスト IP の利用も考えられるが，現時点では広く普及し ておらず，サポートされていません．
 
 #### 8.1.1 Support of Unix sockets
-Given that Unix domain sockets allow listen/connect operations, the current implementation can be configured to listen and accept both client and server connections on a Unix domain socket. These are recognized as sockets where the hostname starts with a ’/’.
+Unilx ドメインソケットはリスン/コネクト操作が可能であることから，現在の実装では，Unix ドメインソケット上でクライアントとサーバの両方の接続をリスンして受け入れるように設定することができます．これは，ホスト名が ’/’ で始まるソケットとして認識されます．
 
-When providing any information about the connections on a Unix domain socket, the server is required to supplant the actual hostname in place of the pathname unless the actual socket name is being asked for.
+Unix ドメインソケットの接続に関する情報を提供する場合，実際のソケット名を要求されない限り，サーバはパス名の代わりに実際のホスト名を指定する必要があります．
 
 ### 8.2 Command Parsing
-To provide useful ’non-buffered’ network IO for clients and servers, each connection is given its own private ’input buffer’ in which the results of the most recent read and parsing are kept. A buffer size of 512 bytes is used so as to hold 1 full message, although, this will usually hold several commands. The private buffer is parsed after every read operation for valid messages. When dealing with multiple messages from one client in the buffer, care should be taken in case one happens to cause the client to be ’removed’.
+クライアントとサーバに便利な’非バッファード’ネットワークIOを提供するために，各接続には専用の’入力バッファ’が与えられ，最新の読み取りと解析の結果が保持されます．バッファのサイズは512バイトで，1つの完全なメッセージを保持することができます．プライベートバッファは，有効なメッセージの読み取り操作のたびに解析されます．一つのクライアントからの複数のメッセージをバッファで扱う場合，あるメッセージによってクライアントが’削除’されることがないように注意する必要があります．
 
 ### 8.3 Message delivery
-It is common to find network links saturated or hosts to which you are sending data unable to send data. Although Unix typically handles this through the TCP window and internal buffers, the server often has large amounts of data to send (especially when a new server-server link forms) and the small buffers provided in the kernel are not enough for the outgoing queue. To alleviate this problem, a "send queue" is used as a FIFO queue for data to be sent.  A typical "send queue" may grow to 200 Kbytes on a large IRC network with a slow network connection when a new server connects.
+ネットワークリンクが飽和したり，データ送信先のホストがデータ送信できなくなることはよくあることです．Unix は通常，TCP ウィンドウと内部バッファによってこれを処理しますが， サーバはしばしば大量の送信データを持ち（特に新しいサーバとサーバのリンクが形成されたとき）， カーネルで提供される小さなバッファでは送信キューに十分ではありません．この問題を軽減するために，送信するデータの FIFO キューとして"送信キュー"が使用されます．典型的な"送信キュー"は，新しいサーバが接続するとき，遅いネットワーク接続を持つ大きな IRC ネットワーク上で200Kバイトに成長するかもしれません．
 
-When polling its connections, a server will first read and parse all incoming data, queuing any data to be sent out. When all available input is processed, the queued data is sent. This reduces the number of write() system calls and helps TCP make bigger packets.
+接続をポーリングする際，サーバはまず受信データをすべて読み込んで解析し，送信すべきデータがあればキューに入れます．利用可能なすべての入力が処理されると，キューに入れられたデータが送信されます．これにより，write() システムコールの回数が減り，TCP がより大きなパケットを作成できるようになります．
 
 ### 8.4 Connection ’Liveness’
-To detect when a connection has died or become unresponsive, the server must ping each of its connections that it doesn’t get a response from in a given amount of time.
+接続が切れたり応答しなくなったりしたことを検知するために，サーバは一定時間内に応答がない接続に対してそれぞれ ping を打つ必要があります．
 
-If a connection doesn’t respond in time, its connection is closed using the appropriate procedures. A connection is also dropped if its sendq grows beyond the maximum allowed, because it is better to close a slow connection than have a server process block.
+接続が時間内に応答しない場合，その接続は適切な手順で閉じられます．サーバプロセスがブロックされるよりも遅い接続を閉じる方が良いので，sendq が許容範囲を超えて大きくなった場合にも，接続は切断されます．
 
 ### 8.5 Establishing a server to client connection
-Upon connecting to an IRC server, a client is sent the MOTD (if present) as well as the current user/server count (as per the LUSER command). The server is also required to give an unambiguous message to the client which states its name and version as well as any other introductory messages which may be deemed appropriate.
+IRC サーバに接続すると，LUSER コマンドにより，MOTD と現在のユーザ/サーバ数がクライアントに送信されます．また，サーバはクライアントに対して，サーバ名とバージョン，その他適切と思われる紹介メッセージを明確に伝えることが要求されます．
 
-After dealing with this, the server must then send out the new user’s nickname and other information as supplied by itself (USER command) and as the server could discover (from DNS/authentication servers).  The server must send this information out with NICK first followed by USER.
+これを処理した後，サーバは新しいユーザのニックネームやその他の情報を自分自身（USER コマンド）で提供したり，サーバが DNS/認証サーバから発見したものを送信する必要があります．サーバは，この情報を NICK の後に USER を付けて送信しなければなりません．
 
 ### 8.6 Establishing a server-server connection.
-The process of establishing of a server-to-server connection is fraught with danger since there are many possible areas where problems can occur - the least of which are race conditions.
+サーバ間の接続は，レースコンディションをはじめ，さまざまな問題が発生する可能性があるため，危険と隣り合わせのプロセスです．
 
-After a server has received a connection following by a PASS/SERVER pair which were recognised as being valid, the server should then reply with its own PASS/SERVER information for that connection as well as all of the other state information it knows about as described below.
+サーバは，有効であると認識された PASS/SERVER のペアに続く接続を受け取った後，その接続のための自身の PASS/SERVER 情報と，以下に述べるように知っている他のすべての状態情報を返信する必要があります．
 
-When the initiating server receives a PASS/SERVER pair, it too then checks that the server responding is authenticated properly before accepting the connection to be that server.
+開始サーバは PASS/SERVER のペアを受け取ると，応答したサーバが適切に認証されていることを確認した上で，そのサーバへの接続を受け入れます．
 
 #### 8.6.1 Server exchange of state information when connecting
-The order of state information being exchanged between servers is essential. The required order is as follows:
+サーバ間で交換される状態情報の順序が重要です．必要な順序は以下の通りです．
 
-* all known other servers;
-* all known user information;
-* all known channel information.
+* 他のすべての既知のサーバ
+* すべての既知のユーザ情報
+* すべての既知のチャネル情報
 
-Information regarding servers is sent via extra SERVER messages, user information with NICK/USER/MODE/JOIN messages and channels with MODE messages.
+サーバに関する情報は SERVER メッセージ，ユーザ情報は NICK/USER/MODE/JOIN メッセージ，チャネルは MODE メッセージで追加送信されます．
 
-NOTE: channel topics are *NOT* exchanged here because the TOPIC command overwrites any old topic information, so at best, the two sides of the connection would exchange topics.
+NOT: TOPIC コマンドは古いトピック情報を上書きするため，ここではチャネルトピックは交換されず，せいぜい接続の両側がトピックを交換する程度です．
 
-By passing the state information about servers first, any collisions with servers that already exist occur before nickname collisions due to a second server introducing a particular nickname. Due to the IRC network only being able to exist as an acyclic graph, it may be possible that the network has already reconnected in another location, the place where the collision occurs indicating where the net needs to split.
+サーバの状態情報を先に渡すことで，第二サーバが特定のニックネームを導入することによるニックネームの衝突よりも先に，既に存在するサーバとの衝突が発生します．IRC ネットワークは非循環グラフとしてしか存在できないため，ネットワークがすでに別の場所で再接続されている可能性があり，衝突が発生した場所はネットを分割する必要がある場所であることを示しています．
 
 ### 8.7 Terminating server-client connections
-When a client connection closes, a QUIT message is generated on behalf of the client by the server to which the client connected. No other message is to be generated or used.
+クライアント接続が終了すると，そのクライアントが接続したサーバがクライアントに代わって QUIT メッセージを生成します．他のメッセージは生成されず，使用されません．
 
 ### 8.8 Terminating server-server connections
-If a server-server connection is closed, either via a remotely generated SQUIT or ’natural’ causes, the rest of the connected IRC network must have its information updated with by the server which detected the closure. The server then sends a list of SQUITs (one for each server behind that connection) and a list of QUITs (again, one for each client behind that connection).
+サーバとサーバの接続が，リモートで生成された SQUIT または’自然な’原因によって閉じられた場合，接続されている残りのIRCネットワークは，閉鎖を検出したサーバによってその情報が更新されなければなりません．サーバは，SQUIT のリスト(その接続の背後にある各サーバについて1つ)とQUITのリスト(再び，その接続の背後にある各クライアントについて1つ)を送信します．
 
 ### 8.9 Tracking nickname changes
-All IRC servers are required to keep a history of recent nickname changes. This is required to allow the server to have a chance of keeping in touch of things when nick-change race conditions occur with commands which manipulate them. Commands which must trace nick changes are:
+すべての IRC サーバは最近のニックネームの変更履歴を保持することが要求されます．これは，ニックネームを操作するコマンドでニックネーム変更の競合状態が発生したときに，サーバが状況を把握する機会を持つために必要です．ニックネームの変更を追跡しなければならないコマンドは以下の通りです．
 
-* KILL (the nick being killed)
-* MODE (+/- o,v)
-* KICK (the nick being kicked)
+* KILL（キルされるニックネーム）
+* MODE（+/- o,v）
+* KICK（キックされるニックネーム）
 
-No other commands are to have nick changes checked for.
+他のコマンドは，ニックネームの変更をチェックさせません．
 
-In the above cases, the server is required to first check for the existence of the nickname, then check its history to see who that nick currently belongs to (if anyone!). This reduces the chances of race conditions but they can still occur with the server ending up affecting the wrong client. When performing a change trace for an above command it is recommended that a time range be given and entries which are too old ignored.
+上記の場合，サーバはまずニックネームの存在を確認し，次にそのニックネームが現在誰に属しているかを確認するために履歴をチェックする必要があります (もし誰かいればですが!)．これはレースコンディションの可能性を減らしますが，サーバが間違ったクライアントに影響を及ぼしてしまうということはまだ起こり得ます．上記のコマンドで変更履歴を調べるときは，時間範囲を指定し，古すぎるエントリは無視することをお勧めします．
 
-For a reasonable history, a server should be able to keep previous nickname for every client it knows about if they all decided to change. This size is limited by other factors (such as memory, etc).
+合理的な履歴のために，サーバは，すべてのクライアントが変更することを決めた場合，サーバが知っているすべてのクライアントのために前のニックネームを保持することができるはずです．このサイズは他の要因(例えばメモリなど)によって制限されます．
 
 ### 8.10 Flood control of clients
-With a large network of interconnected IRC servers, it is quite easy for any single client attached to the network to supply a continuous stream of messages that result in not only flooding the network, but also degrading the level of service provided to others. Rather than require every ’victim’ to be provide their own protection, flood protection was written into the server and is applied to all clients except services. The current algorithm is as follows:
+IRC サーバが相互に接続された大規模なネットワークでは，ネットワークに接続している任意の1つのクライアントが連続的にメッセージを供給することは非常に簡単で，その結果，ネットワークが氾濫するだけでなく，他のクライアントに提供するサービスのレベルを低下させることになるのです．大量リクエスト対策は，すべての’犠牲者’に独自の対策を要求するのではなく，サーバに書き込まれ，サービスを除くすべてのクライアントに適用されます．現在のアルゴリズムは以下の通りである．
 
-* check to see if client’s ‘message timer’ is less than current time (set to be equal if it is);
-* read any data present from the client;
-* while the timer is less than ten seconds ahead of the current time, parse any present messages and penalize the client by 2 seconds for each message;
+* クライアントの‘メッセージタイマー‘が現在の時刻より小さいかどうかを確認します（小さい場合は等しくなるように設定します）．
+* クライアントから存在するあらゆるデータを読み取ります．
+* タイマーが現在時刻より10秒以上進んでいる間に，現在のメッセージを解析し，メッセージごとにクライアントに2秒のペナルティーを課します．
 
-which in essence means that the client may send 1 message every 2 seconds without being adversely affected.
+これは要するに，クライアントが2秒に1回メッセージを送信しても悪影響がないことを意味します．
 
 ### 8.11 Non-blocking lookups
-In a real-time environment, it is essential that a server process do as little waiting as possible so that all the clients are serviced fairly. Obviously this requires non-blocking IO on all network read/write operations. For normal server connections, this was not difficult, but there are other support operations that may cause the server to block (such as disk reads). Where possible, such activity should be performed with a short timeout.
+リアルタイム環境では，すべてのクライアントに公平にサービスを提供するために，サーバプロセスができるだけ待機しないことが重要です．このためには，ネットワーク上のすべての読み取り/書き込み操作において，ノンブロッキング IO が必要であることは明らかです．通常のサーバ接続では，これは難しいことではありませんでしたが，サーバがブロックする可能性がある他のサポート操作（ディスク読み取りなど）があります．可能であれば，そのような動作は短いタイムアウトで実行されるべきです．
 
 #### 8.11.1 Hostname (DNS) lookups
-Using the standard resolver libraries from Berkeley and others has meant large delays in some cases where replies have timed out. To avoid this, a separate set of DNS routines were written which were setup for non-blocking IO operations and then polled from within the main server IO loop.
+Berkeley などの標準的なリゾルバライブラリを使用すると，返信がタイムアウトになるケースがあり，大きな遅延が発生しました．これを避けるために，DNS ルーチンの別セットが書かれました．これは，ノンブロッキング IO オペレーション用にセットアップされ，メインサーバの IO ループの中からポーリングされます．
 
 #### 8.11.2 Username (Ident) lookups
-Although there are numerous ident libraries for use and inclusion into other programs, these caused problems since they operated in a synchronous manner and resulted in frequent delays. Again the solution was to write a set of routines which would cooperate with the rest of the server and work using non-blocking IO.
+他のプログラムに組み込んで使用するための ident ライブラリは数多く存在しますが，これらは同期的に動作するため，遅延が頻繁に発生するという問題がありました．この場合も，サーバの他の部分と協調し，ノンブロッキング IO で動作するルーチン群を書くことが解決策となりました．
 
 ### 8.12 Configuration File
-To provide a flexible way of setting up and running the server, it is recommended that a configuration file be used which contains instructions to the server on the following:
+サーバの設定や運用を柔軟に行うために，以下のようなサーバへの指示を含む設定ファイルを使用することが推奨されます．
 
-* which hosts to accept client connections from;
-* which hosts to allow to connect as servers;
-* which hosts to connect to (both actively and passively);
-* information about where the server is (university, city/state, company are examples of this);
-* who is responsible for the server and an email address at which they can be contacted;
-* hostnames and passwords for clients which wish to be given access to restricted operator commands.
+* クライアントからの接続を受け付けるホストを指定します．
+* サーバとして接続を許可するホストを指定します．
+* サーバとして接続を許可するホストを指定します．
+* どのホストに接続するか（アクティブおよびパッシブの両方）．
+* サーバがどこにあるかという情報（大学，都市／州，会社がその例です）．
+* サーバの責任者と連絡可能な電子メールアドレス．
+* 制限されたオペレータコマンドへのアクセスを希望するクライアントのホスト名とパスワード．
 
-In specifying hostnames, both domain names and use of the ’dot’ notation (127.0.0.1) should both be accepted. It must be possible to specify the password to be used/accepted for all outgoing and incoming connections (although the only outgoing connections are those to other servers).
+ホスト名の指定は，ドメイン名とドット表記（127.0.0.1）の両方が可能である必要があります．送信および受信のすべての接続で使用/受信するパスワードを指定できるようにしなければなりません（ただし，送信接続は他のサーバへの接続のみ）．
 
-The above list is the minimum requirement for any server which wishes to make a connection with another server. Other items which may be of use are:
+上記のリストは，他のサーバとの接続を希望するサーバに最低限必要なものです．その他，参考になる項目は以下の通りです．
 
-* specifying which servers other server may introduce;
-* how deep a server branch is allowed to become;
-* hours during which clients may connect.
+* 他のサーバが導入できるサーバを指定する．
+* サーバの分岐をどこまで深くするか．
+* クライアントが接続可能な時間帯
 
 #### 8.12.1 Allowing clients to connect
-A server should use some sort of ’access control list’ (either in the configuration file or elsewhere) that is read at startup and used to decide what hosts clients may use to connect to it.
+サーバは，起動時に読み込まれるある種の’アクセス制御リスト’（設定ファイルまたはその他の場所）を使用して，クライアントが接続するために使用するホストを決定する必要があります．
 
-Both ’deny’ and ’allow’ should be implemented to provide the required flexibility for host access control.
+ホストアクセス制御に必要な柔軟性を提供するために，’deny’ と ’allow’ の両方を実装する必要があります．
 
 #### 8.12.2 Operators
-The granting of operator privileges to a disruptive person can have dire consequences for the well-being of the IRC net in general due to the powers given to them. Thus, the acquisition of such powers should not be very easy. The current setup requires two ’passwords’ to be used although one of them is usually easy guessed. Storage of oper passwords in configuration files is preferable to hard coding them in and should be stored in a crypted format (ie using crypt(3) from Unix) to prevent easy theft.
+破壊的な人物にオペレータの特権を与えることは，その人物に与えられた権限によって，IRC ネット全般の幸福に悲惨な結果をもたらす可能性があります．したがって，そのような権限の取得は非常に簡単であってはなりません．現在の設定では，2つの ’パスワード’ が必要ですが，そのうちの1つは通常簡単に推測されます．オペレーティングシステムのパスワードを設定ファイルに保存することは，ハードコーディングするよりも望ましく，簡単に盗まれないように暗号化されたフォーマットで保存されるべきです (例えば，Unix の crypt(3) を使用します)．
 
 #### 8.12.3 Allowing servers to connect
-The interconnection of server is not a trivial matter: a bad connection can have a large impact on the usefulness of IRC. Thus, each server should have a list of servers to which it may connect and which servers may connect to it. Under no circumstances should a server allow an arbitrary host to connect as a server. In addition to which servers may and may not connect, the configuration file should also store the password and other characteristics of that link.
+サーバの相互接続は些細なことではありません．接続不良は IRC の有用性に大きな影響を与える可能性があります．したがって，各サーバは接続できるサーバのリストと，どのサーバがそれに接続できるかのリストを持つべきです．どんな場合でも，サーバは任意のホストがサーバとして接続することを許可してはいけません．どのサーバが接続できて，どのサーバが接続できないかに加えて，設定ファイルにはそのリンクのパスワードや他の特性も保存されるべきです．
 
 #### 8.12.4 Administrivia
-To provide accurate and valid replies to the ADMIN command (see section 4.3.7), the server should find the relevant details in the configuration.
+ADMIN コマンド（[4.3.7 Admin command](#437-admin-command) 項参照）に対して正確で有効な返答をするために，サーバは設定から関連する詳細を見つけ出す必要があります．
 
 ### 8.13 Channel membership
-The current server allows any registered local user to join upto 10 different channels. There is no limit imposed on non-local users so that the server remains (reasonably) consistant with all others on a channel membership basis
+現在のサーバでは，登録したローカルユーザが最大10個の異なるチャネルに参加することができます．非ローカルユーザには制限がないため，サーバはチャネルメンバーシップに関して他のすべてのユーザと（合理的に）一貫性を保つことができます．
 
 ## 9. Current problems
 There are a number of recognized problems with this protocol, all of which hope to be solved sometime in the near future during its rewrite. Currently, work is underway to find working solutions to these problems.
