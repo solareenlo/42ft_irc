@@ -159,7 +159,7 @@ IRC自体は電話会議システムで，クライアント・サーバモデ�
 ```
 
 ### 1.2 Clients
-クライアントとは，他のサーバではないサーバに接続するものです．各クライアントは，最大9文字のユニークなニックネームによって他のクライアントと区別されます．ニックネームに使用できるもの，できないものについては，プロトコルの文法規則を参照してください．ニックネームに加えて，全てのサーバは全てのクライアントに関する以下の情報を 持っていなければなりません: クライアントが動作しているホストの実名，そのホスト上でのクライアントの ユーザ名，クライアントが接続しているサーバ．
+クライアントとは，他のサーバではないサーバに接続するものです．各クライアントは，最大9文字の一意なニックネームによって他のクライアントと区別されます．ニックネームに使用できるもの，できないものについては，プロトコルの文法規則を参照してください．ニックネームに加えて，全てのサーバは全てのクライアントに関する以下の情報を 持っていなければなりません: クライアントが動作しているホストの実名，そのホスト上でのクライアントの ユーザ名，クライアントが接続しているサーバ．
 
 #### 1.2.1 Operators
 IRCネットワーク内の秩序を保つために，特別なクライアント（オペレータ）がネットワーク上で一般的なメンテナンス機能を実行することが許されています．オペレータに与えられた権限は「危険」とみなされることもありますが，それにもかかわらず，それらは必要とされます．オペレータは，不正なネットワーク・ルーティングの長期使用を防ぐために，必要に応じてサーバの切断や再接続などの基本的なネットワーク・タスクを実行できるようにする必要があります．この必要性を認識し，ここで議論されるプロトコルは，オペレータのみがそのような機能を実行できるように規定しています．[4.1.7 (SQUIT)](#417-server-quit-message) と [4.3.5 (CONNECT)](#435-connect-message) の項を参照してください．
@@ -531,7 +531,7 @@ SQUIT tolsun.oulu.fi :Bad Link?
 ```
 
 ### 4.2 Channel operations
-このメッセージ群は，チャネル，そのプロパティ（チャネルモード），およびそのコンテンツ（通常はクライアント）を操作することに関係しています． これらの実装では，ネットワークの反対側の端にいるクライアントがコマンドを送ると，最終的に衝突してしまうため，多くのレースコンディションが避けられない．また，パラメータが与えられると，それが最近変更された場合に備えてサーバがその履歴をチェックすることを確実にするために，サーバがニックネームの履歴を保持することが要求されます．
+このメッセージ群は，チャネル，そのプロパティ（チャネルモード），およびそのコンテンツ（通常はクライアント）を操作することに関係しています． これらの実装では，ネットワークの反対側の端にいるクライアントがコマンドを送ると，最終的に衝突してしまうため，多くの競合状態が避けられない．また，パラメータが与えられると，それが最近変更された場合に備えてサーバがその履歴をチェックすることを確実にするために，サーバがニックネームの履歴を保持することが要求されます．
 
 #### 4.2.1 Join message
 ```
@@ -1936,7 +1936,7 @@ IRC サーバに接続すると，LUSER コマンドにより，MOTD と現在�
 これを処理した後，サーバは新しいユーザのニックネームやその他の情報を自分自身（USER コマンド）で提供したり，サーバが DNS/認証サーバから発見したものを送信する必要があります．サーバは，この情報を NICK の後に USER を付けて送信しなければなりません．
 
 ### 8.6 Establishing a server-server connection.
-サーバ間の接続は，レースコンディションをはじめ，さまざまな問題が発生する可能性があるため，危険と隣り合わせのプロセスです．
+サーバ間の接続は，競合状態をはじめ，さまざまな問題が発生する可能性があるため，危険と隣り合わせのプロセスです．
 
 サーバは，有効であると認識された PASS/SERVER のペアに続く接続を受け取った後，その接続のための自身の PASS/SERVER 情報と，以下に述べるように知っている他のすべての状態情報を返信する必要があります．
 
@@ -1970,7 +1970,7 @@ NOT: TOPIC コマンドは古いトピック情報を上書きするため，こ
 
 他のコマンドは，ニックネームの変更をチェックさせません．
 
-上記の場合，サーバはまずニックネームの存在を確認し，次にそのニックネームが現在誰に属しているかを確認するために履歴をチェックする必要があります (もし誰かいればですが!)．これはレースコンディションの可能性を減らしますが，サーバが間違ったクライアントに影響を及ぼしてしまうということはまだ起こり得ます．上記のコマンドで変更履歴を調べるときは，時間範囲を指定し，古すぎるエントリは無視することをお勧めします．
+上記の場合，サーバはまずニックネームの存在を確認し，次にそのニックネームが現在誰に属しているかを確認するために履歴をチェックする必要があります (もし誰かいればですが!)．これは競合状態の可能性を減らしますが，サーバが間違ったクライアントに影響を及ぼしてしまうということはまだ起こり得ます．上記のコマンドで変更履歴を調べるときは，時間範囲を指定し，古すぎるエントリは無視することをお勧めします．
 
 合理的な履歴のために，サーバは，すべてのクライアントが変更することを決めた場合，サーバが知っているすべてのクライアントのために前のニックネームを保持することができるはずです．このサイズは他の要因(例えばメモリなど)によって制限されます．
 
@@ -2029,26 +2029,26 @@ ADMIN コマンド（[4.3.7 Admin command](#437-admin-command) 項参照）に�
 現在のサーバでは，登録したローカルユーザが最大10個の異なるチャネルに参加することができます．非ローカルユーザには制限がないため，サーバはチャネルメンバーシップに関して他のすべてのユーザと（合理的に）一貫性を保つことができます．
 
 ## 9. Current problems
-There are a number of recognized problems with this protocol, all of which hope to be solved sometime in the near future during its rewrite. Currently, work is underway to find working solutions to these problems.
+このプロトコルにはいくつかの問題があるとされており，近い将来，書き換えの際に解決されることが期待されています．現在，これらの問題に対する実用的な解決策を見つけるための作業が進行中です．
 
 ### 9.1 Scalability
-It is widely recognized that this protocol does not scale sufficiently well when used in a large arena. The main problem comes from the requirement that all servers know about all other servers and users and that information regarding them be updated as soon as it changes. It is also desirable to keep the number of servers low so that the path length between any two points is kept minimal and the spanning tree as strongly branched as possible.
+このプロトコルは，大規模な舞台で使用する場合，十分にスケールしないことが広く認識されています．主な問題は，すべてのサーバが他のすべてのサーバとユーザについて知っており，それらに関する情報が変更されるとすぐに更新されるという要件から来るものです．また，任意の2点間の経路長が最小に保たれ，スパニングツリーができるだけ強く分岐するように，サーバの数を少なくすることが望まれます．
 
 ### 9.2 Labels
-The current IRC protocol has 3 types of labels: the nickname, the channel name and the server name. Each of the three types has its own domain and no duplicates are allowed inside that domain.  Currently, it is possible for users to pick the label for any of the three, resulting in collisions. It is widely recognized that this needs reworking, with a plan for unique names for channels and nicks that don’t collide being desirable as well as a solution allowing a cyclic tree.
+現在のIRCプロトコルには，ニックネーム，チャネル名，サーバ名の3種類のラベルがあります．3つのタイプはそれぞれ独自のドメインを持っており，そのドメイン内では重複が許されません． 現状では，ユーザが3種類のラベルのどれかを選ぶことが可能であり，その結果，衝突が発生しています．チャネル名とニックネームが衝突しないような一意な名前にする計画や，サイクリック・ツリーを可能にするソリューションが望ましいと広く認識されています．
 
 #### 9.2.1 Nicknames
-The idea of the nickname on IRC is very convenient for users to use when talking to each other outside of a channel, but there is only a finite nickname space and being what they are, its not uncommon for several people to want to use the same nick. If a nickname is chosen by two people using this protocol, either one will not succeed or both will removed by use of KILL (4.6.1).
+IRC におけるニックネームの考え方は，ユーザがチャネル外で会話する際に非常に便利ですが，ニックネームのスペースは有限であり，複数の人が同じニックネームを使いたいと思うことは珍しいことではありません．もしこのプロトコルを使って二人がニックネームを選んだ場合，どちらかが成功しないか，KILL ([4.6.1 Kill message](#461-kill-message)) を使うことで両方が削除されるでしょう．
 
 #### 9.2.2 Channels
-The current channel layout requires that all servers know about all channels, their inhabitants and properties. Besides not scaling well, the issue of privacy is also a concern. A collision of channels is treated as an inclusive event (both people who create the new channel are considered to be members of it) rather than an exclusive one such as used to solve nickname collisions.
+現在のチャネルレイアウトでは，すべてのサーバがすべてのチャネル，その住人，プロパティについて知っている必要があります．うまく拡張できないことに加えて，プライバシーの問題も懸念されます．チャネルの衝突は，ニックネームの衝突を解決するために使用されるような排他的なものではなく，新しいチャネルを作成した両方の人々がそのメンバーであるとみなされる包括的なイベントとして扱われます．
 
 #### 9.2.3 Servers
-Although the number of servers is usually small relative to the number of users and channels, they two currently required to be known globally, either each one separately or hidden behind a mask.
+サーバの数は通常，ユーザやチャネルの数に比べて少ないのですが，現在，2つのサーバはそれぞれ個別に，またはマスクの後ろに隠されて，グローバルに知られていることが要求されています．
 
 ###  9.3 Algorithms
-In some places within the server code, it has not been possible to avoid N^2 algorithms such as checking the channel list of a set of clients.
+サーバコード内のいくつかの場所では，クライアントのセットのチャネルリストをチェックするようなN^2アルゴリズムを回避することができませんでした．
 
-In current server versions, there are no database consistency checks, each server assumes that a neighbouring server is correct. This opens the door to large problems if a connecting server is buggy or otherwise tries to introduce contradictions to the existing net.
+現在のサーバのバージョンでは，データベースの整合性チェックがなく，各サーバは隣接するサーバが正しいことを前提にしています．そのため，接続先のサーバがバグっていたり，既存のネットに矛盾を持ち込もうとしたりすると，大きな問題が発生する可能性があります．
 
-Currently, because of the lack of unique internal and global labels, there are a multitude of race conditions that exist. These race conditions generally arise from the problem of it taking time for messages to traverse and effect the IRC network. Even by changing to unique labels, there are problems with channel-related commands being disrupted.
+現在，内部およびグローバルラベルが一意でないため，多数の競合状態が存在します．これらの競合状態は，一般に，メッセージが IRC ネットワークを横断して影響を及ぼすのに時間がかかるという問題から発生します．一意なラベルに変更することによっても，チャネル関連のコマンドが中断される問題があります．
