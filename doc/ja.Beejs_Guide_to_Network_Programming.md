@@ -217,12 +217,12 @@ IPアドレスはホテルの番地、ポート番号は部屋番号だと思っ
 
 "n"、"h"、"s"、"l "の組み合わせは、本当にくだらないものを除いて、すべて使うことができるのです。たとえば、stolh() ("Short to Long Host") という関数はありません-とにかく、このパーティーでは。しかし、あるのです。
 
-| Function | Description           |
-|----------|-----------------------|
-| htons()  | host to network short |
-| htonl()  | host to network long  |
-| ntohs()  | network to host short |
-| ntohl()  | network to host long  |
+| Function  | Description           |
+|-----------|-----------------------|
+| `htons()` | host to network short |
+| `htonl()` | host to network long  |
+| `ntohs()` | network to host short |
+| `ntohl()` | network to host long  |
 
 基本的には、送出する前にネットワークバイトオーダーに変換し、送出後にホストバイトオーダーに変換します。
 
