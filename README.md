@@ -1,6 +1,9 @@
 # 【WIP :)】42ft_irc
 
 ## Reference
+### Socket
+- [ソケットとは](http://research.nii.ac.jp/~ichiro/syspro98/socket.html)
+
 ### IRC Documentation
 - [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol ([ja](https://github.com/solareenlo/42ft_irc/blob/main/doc/ja.rfc1459.md))
 - [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture ([ja](https://tex2e.github.io/rfc-translater/html/rfc2810.html))
@@ -16,6 +19,7 @@
 - [Service Name and Transport Protocol Port Number Registry](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=IRC)
 
 ### Article
+- [Beej's Guide to Network Programming Using Internet Sockets](https://beej.us/guide/bgnet/)
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/)
 - [Beej's cheesy chat example](https://beej.us/guide/bgnet/examples/selectserver.c)
 - [Modern IRC Client Protocol](https://modern.ircdocs.horse/)
