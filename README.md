@@ -20,7 +20,7 @@
 
 ### Article
 - [Beej's Guide to Network Programming Using Internet Sockets](https://beej.us/guide/bgnet/)
-- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/)
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/) ([ja](https://github.com/solareenlo/42ft_irc/blob/main/doc/ja.Beejs_Guide_to_Network_Programming.md))
 - [Beej's cheesy chat example](https://beej.us/guide/bgnet/examples/selectserver.c)
 - [Modern IRC Client Protocol](https://modern.ircdocs.horse/)
 - [A typical client-server program flow chart](https://www.ibm.com/docs/en/zos/2.4.0?topic=internets-typical-client-server-program-flow-chart#o4ag1__tiptcp)
