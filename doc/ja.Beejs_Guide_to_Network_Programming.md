@@ -28,7 +28,7 @@ v3.1.5, Copyright © November 20, 2020
   * [5.5 listen()—Will somebody please call me?](#55-listenwill-somebody-please-call-me)
   * [5.6 accept()—“Thank you for calling port 3490.”](#56-acceptthank-you-for-calling-port-3490)
   * [5.7 send() and recv()—Talk to me, baby!](#57-send-and-recvtalk-to-me-baby)
-  * [5.8 sendto() and recvfrom()—Talk to me, DGRAM-style](#58-sendto-and-recvfromtalk-to-me--dgram-style)
+  * [5.8 sendto() and recvfrom()—Talk to me, DGRAM-style](#58-sendto-and-recvfromtalk-to-me-dgram-style)
   * [5.9 close() and shutdown()—Get outta my face!](#59-close-and-shutdownget-outta-my-face)
   * [5.10 getpeername()—Who are you?](#510-getpeernamewho-are-you)
   * [5.11 gethostname()—Who am I?](#510-getpeernamewho-are-you)
