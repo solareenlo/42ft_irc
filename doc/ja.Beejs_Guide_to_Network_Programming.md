@@ -948,7 +948,7 @@ int sendto(int sockfd, const void *msg, int len, unsigned int flags,
 
 見ての通り、この呼び出しは基本的に`send()`の呼び出しと同じで、他に2つの情報が追加されています。`to`は`struct sockaddr`へのポインターで（おそらく直前にキャストした別の`struct sockaddr_in`や`struct sockaddr_in6`、`struct sockaddr_storage`になるでしょう）、送信先のIPアドレスとポートが含まれています。`tolen`は`int`型ですが、単純に`sizeof *to`または`sizeof(struct sockaddr_storage)`に設定することができます。
 
-宛先アドレスの構造体を手に入れるには、以下の`getaddrinfo()`や`recvfrom()`から取得するか、手で記入することになると思います。
+宛先アドレスの構造体を手に入れるには、`getaddrinfo()`や以下の`recvfrom()`から取得するか、手で記入することになると思います。
 
 `send()` と同様、`sendto()` は実際に送信したバイト数 (これも、送信するように指示したバイト数よりも少ないかもしれません!) を返し、エラーの場合は -1 を返します。
 
@@ -959,7 +959,7 @@ int recvfrom(int sockfd, void *buf, int len, unsigned int flags,
              struct sockaddr *from, int *fromlen);
 ```
 
-これも `recv()` と同様であるが、いくつかのフィールドが追加されています。`from` はローカルの `struct sockaddr_storage` へのポインタで、送信元のマシンの IP アドレスとポートが格納される。`fromlen` はローカルの `int` へのポインタであり、`sizeof *from` または `sizeof(struct sockaddr_storage)` に初期化する必要があります。この関数が戻ったとき、`fromlen`は実際に`from`に格納されたアドレスの長さを含みます。
+これも `recv()` と同様であるが、いくつかのフィールドが追加されています。`from` はローカルの `struct sockaddr_storage` へのポインタで、送信元のマシンの IP アドレスとポートが格納されます。`fromlen` はローカルの `int` へのポインタであり、`sizeof *from` または `sizeof(struct sockaddr_storage)` に初期化する必要があります。この関数が戻ったとき、`fromlen`は実際に`from`に格納されたアドレスの長さを含みます。
 
 `recvfrom()` は受信したバイト数を返し、エラーの場合は -1 を返します（errno はそれに応じて設定されます）。
 
@@ -978,7 +978,7 @@ close(sockfd);
 
 これにより、それ以上のソケットへの読み書きができなくなります。リモート側でソケットの読み書きをしようとすると、エラーが発生します。
 
-ソケットの閉じ方をもう少し制御したい場合は、`shutdown()`関数を使用します。この関数では、特定の方向、あるいは両方の通信を遮断することができます (ちょうど `close()` がそうであるように)。概要
+ソケットの閉じ方をもう少し制御したい場合は、`shutdown()`関数を使用します。この関数では、特定の方向、あるいは両方の通信を遮断することができます (ちょうど `close()` がそうであるように)。概要:
 
 ```cpp
 int shutdown(int sockfd, int how);
@@ -1037,7 +1037,19 @@ int gethostname(char *hostname, size_t size);
 この関数は，正常に終了した場合は0を，エラーの場合は-1を返し，通常通りerrnoを設定します。
 
 ## 6 Client-Server Background
-クライアント・サーバの世界なのだ。ネットワーク上のあらゆることが、クライアント・プロセスとサーバ・プロセスとの対話、またはその逆を扱っています。たとえば、telnetを考えてみよう。ポート23のリモートホストにtelnetで接続すると（クライアント）、そのホスト上のプログラム（telnetdと呼ばれるサーバ）が起動する。このプログラムは、送られてきたtelnet接続を処理し、ログインプロンプトを表示するなどの設定を行います。
+クライアント-サーバの世界なのだ。ネットワーク上のあらゆることが、クライアント・プロセスとサーバ・プロセスとの対話、またはその逆を扱っています。たとえば、telnetを考えてみよう。ポート23のリモートホストにtelnetで接続すると（クライアント）、そのホスト上のプログラム（telnetdと呼ばれるサーバ）が起動します。このプログラムは、送られてきたtelnet接続を処理し、ログインプロンプトを表示するなどの設定を行います。
+
+```shell
+        The Network
+         +--------+
+         |request |
+send() ------------->  recv()
+Client   |        |    Server
+recv() <-------------  send()
+         |response|
+         +--------+
+```
+クライアント-サーバの相互作用
 
 クライアントとサーバ間の情報のやりとりは、上の図のようにまとめられます。
 
@@ -1199,7 +1211,7 @@ int main(void)
 このサーバからデータを取得するには、次のセクションに記載されているクライアントを使用します。
 
 ### 6.2 A Simple Stream Client
-こいつはサーバよりもっと簡単だ。このクライアントがすることは コマンドラインで指定したホスト、ポート3490に接続するだけです。サーバが送信する文字列を取得します。
+こいつはサーバよりもっと簡単です。このクライアントがすることは コマンドラインで指定したホスト、ポート3490に接続するだけです。サーバが送信する文字列を取得します。
 
 [クライアントソース](https://beej.us/guide/bgnet/examples/client.c)。
 
@@ -1302,7 +1314,7 @@ int main(int argc, char *argv[])
 クライアントを実行する前にサーバを実行しない場合、`connect()` は "Connection refused" を返すことに注意してください。非常に便利です。
 
 ### 6.3 Datagram Sockets
-UDPデータグラムソケットの基本は，上記の`sendto()`と`recvfrom()`ですでに説明しましたので，ここでは`talker.c`と`listener.c`という2つのサンプルプログラムのみを紹介します。
+UDPデータグラムソケットの基本は，上記の [5.8 sendto() and recvfrom()—Talk to me, DGRAM-style](#58-sendto-and-recvfromtalk-to-me-dgram-style) ですでに説明しましたので，ここでは`talker.c`と`listener.c`という2つのサンプルプログラムのみを紹介します。
 
 listenerは、ポート4950で入ってくるパケットを待つマシンに座っています。talkerは、指定されたマシンのそのポートに、ユーザがコマンドラインに入力したものを含むパケットを送信します。
 
