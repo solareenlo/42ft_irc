@@ -21,9 +21,17 @@ v3.1.5, Copyright © November 20, 2020
     + [3.4.1 Private (Or Disconnected) Networks](#341-private-or-disconnected-networks)
 - [4 Jumping from IPv4 to IPv6](#4-jumping-from-ipv4-to-ipv6)
 - [5 System Calls or Bust](#5-system-calls-or-bust)
-  * [5.1 getaddrinfo()—Prepare to launch!](#51-getaddrinfo---prepare-to-launch-)
-  * [5.2 socket()—Get the File Descriptor!](#52-socket---get-the-file-descriptor-)
-  * [5.3 bind()—What port am I on?](#53-bind---what-port-am-i-on-)
+  * [5.1 getaddrinfo()—Prepare to launch!](#51-getaddrinfo-prepare-to-launch)
+  * [5.2 socket()—Get the File Descriptor!](#52-socket-get-the-file-descriptor)
+  * [5.3 bind()—What port am I on?](#53-bind-what-port-am-i-on)
+  * [5.4 connect()—Hey, you!](#54-connect-hey-you)
+  * [5.5 listen()—Will somebody please call me?](#55-listen-will-somebody-please-call-me)
+  * [5.6 accept()—“Thank you for calling port 3490.”](#56-accept-thank-you-for-calling-port-3490)
+  * [5.7 send() and recv()—Talk to me, baby!](#57-send-and-recv-talk-to-me--baby)
+  * [5.8 sendto() and recvfrom()—Talk to me, DGRAM-style](#58-sendto-and-recvfrom-talk-to-me-dgram-style)
+  * [5.9 close() and shutdown()—Get outta my face!](#59-close-and-shutdown-get-outta-my-face)
+  * [5.10 getpeername()—Who are you?](#510-getpeername-who-are-you)
+  * [5.11 gethostname()—Who am I?](#511-gethostname-who-am-i)
 
 </details>
 
@@ -745,3 +753,281 @@ if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) {
 ```
 
 `bind()`について、最後にちょっとした注意点があります。`bind()`を絶対に呼び出す必要がない場合があります。リモートマシンに `connect()` する際に、ローカルポートを気にしない場合 (telnet のようにリモートポートを気にする場合) は、単に `connect()` をコールすれば、ソケットが未束縛かどうかをチェックし、必要なら未使用のローカルポートに `bind()` してくれます。
+
+### 5.4 connect()—Hey, you!
+ちょっとだけ、あなたがtelnetアプリケーションであることを仮定してみましょう。ユーザーが（映画 TRON のように）ソケットファイル記述子を取得するように命令します。あなたはそれに応じ、`socket()`を呼び出します。次に、ユーザはポート `23` (標準的な telnet ポート) で `10.12.110.57` に接続するように指示します。やったー! どうするんだ？
+
+幸運なことに、あなたは今、`connect()`のセクションを読んでいるところです。だから、猛烈に読み進めよう! 時間がない!
+
+`connect()`の呼び出しは以下の通りである。
+
+```cpp
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
+```
+
+`sockfd`は`socket()`コールで返される、我々の身近なソケットファイル記述子、`serv_addr`は宛先ポートとIPアドレスを含む`sockaddr`構造体、`addrlen`はサーバーアドレス構造体のバイト長です。
+
+これらの情報はすべて、`getaddrinfo()`の呼び出しの結果から得ることができ、これはロックします。
+
+だんだん分かってきたかな？ここからは聞こえないので、そうであることを祈るしかないですね。ポート3490の "www.example.com "にソケット接続する例を見てみましょう。
+
+```cpp
+struct addrinfo hints, *res;
+int sockfd;
+
+// first, load up address structs with getaddrinfo():
+
+memset(&hints, 0, sizeof hints);
+hints.ai_family = AF_UNSPEC;
+hints.ai_socktype = SOCK_STREAM;
+
+getaddrinfo("www.example.com", "3490", &hints, &res);
+
+// make a socket:
+
+sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+// connect!
+
+connect(sockfd, res->ai_addr, res->ai_addrlen);
+```
+
+繰り返しになりますが、古いタイプのプログラムでは、独自の `sockaddr_ins` 構造体を作成して `connect()` に渡していました。必要であれば、そうすることができます。上の [5.3 bind()—What port am I on?](#53-bind-what-port-am-i-on) の節で同様のことを書いています。
+
+`connect()`の戻り値を必ず確認してください。エラー時に-1が返され、errnoという変数がセットされます。
+
+また、`bind()`を呼んでいないことに注意してください。基本的に、私たちはローカルのポート番号には関心がありません。カーネルは私たちのためにローカルポートを選択し、接続先のサイトは自動的にこの情報を取得します。心配はいりません。
+
+### 5.5 listen()—Will somebody please call me?
+よし、気分転換の時間だ。リモートホストに接続したくない場合はどうすればいいのでしょう。例えば、接続が来るのを待ち、何らかの方法でそれを処理したいとします。この処理は2段階です。まず `listen()` を行い、次に `accept()` を行います (後述)。
+
+`listen()`の呼び出しはかなり単純ですが、少し説明が必要です。
+
+```cpp
+int listen(int sockfd, int backlog);
+```
+
+`sockfd` は `socket()` システムコールから得られる通常のソケットファイル記述子です。これはどういう意味でしょうか？着信した接続は、`accept()` (後述) するまでこのキューで待機することになりますが、このキューに入れることができる数の上限を表しているのです。ほとんどのシステムでは、この数を黙って約 20 に制限しています。おそらく、5 や 10 に設定しても大丈夫でしょう。
+
+ここでも、いつものように listen() は -1 を返し、エラー時には errno をセットします。
+
+さて、想像がつくと思いますが、サーバが特定のポートで動作するように `listen()` を呼び出す前に `bind()` を呼び出す必要があります。(どのポートに接続するかを仲間に伝えることができなければなりません!) ですから、もし接続を待ち受けるのであれば、一連のシステムコールは次のようになります。
+
+```cpp
+getaddrinfo();
+socket();
+bind();
+listen();
+/* accept() goes here */
+```
+
+かなり自明なので、サンプルコードの代わりに置いておきます。(以下の`accept()`セクションのコードはより完全なものです。) この全体の中で本当に厄介なのは、`accept()`の呼び出しです。
+
+### 5.6 accept()—“Thank you for calling port 3490.”
+`accept()`の呼び出しはちょっと変です。これから起こることはこうです。遠く離れた誰かが、あなたが `listen()` しているポートであなたのマシンに `connect()` しようとするでしょう。その接続は、`accept()`されるのを待つためにキューに入れられることになります。あなたは `accept()` をコールし、保留中の接続を取得するように指示します。すると、この接続に使用する新しいソケットファイル記述子が返されます! そうです、1つの値段で2つのソケットファイル記述子を手に入れたことになります。元のソケットファイル記述子はまだ新しい接続を待ち続けており、新しく作成されたソケットファイル記述子はようやく `send()` と `recv()` を行う準備が整いました。着いたぞ!
+
+通話内容は以下の通りです。
+
+```cpp
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrl
+```
+
+`sockfd`は`listen()`するソケットディスクリプタです。`addr`は通常、ローカルの構造体`sockaddr_storage`へのポインタになります。この構造体には、着信接続に関する情報が格納されます(これにより、どのホストがどのポートから電話をかけてきたかを判断することができます)。`addrlen` はローカルの整数型変数で、そのアドレスが `accept()` に渡される前に `sizeof(struct sockaddr_storage)` に設定されなければなりません。`accept()` は、`addr` にそれ以上のバイト数を入れることはありません。もし、それ以下のバイト数であれば、`addrlen` の値を変更します。
+
+何だと思いますか？`accept()`は-1を返し、エラーが発生した場合は errno をセットします。そうだったんですか。
+
+前回と同様、一度に吸収するのは大変なので、サンプルコードの一部をご覧ください。
+
+```cpp
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+#define MYPORT "3490"  // the port users will be connecting to
+#define BACKLOG 10     // how many pending connections queue will hold
+
+int main(void)
+{
+    struct sockaddr_storage their_addr;
+    socklen_t addr_size;
+    struct addrinfo hints, *res;
+    int sockfd, new_fd;
+
+    // !! don't forget your error checking for these calls !!
+
+    // first, load up address structs with getaddrinfo():
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+
+    getaddrinfo(NULL, MYPORT, &hints, &res);
+
+    // make a socket, bind it, and listen on it:
+
+    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    bind(sockfd, res->ai_addr, res->ai_addrlen);
+    listen(sockfd, BACKLOG);
+
+    // now accept an incoming connection:
+
+    addr_size = sizeof their_addr;
+    new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
+
+    // ready to communicate on socket descriptor new_fd!
+    .
+    .
+    .
+```
+
+ここでも、すべての `send()` と `recv()` の呼び出しに、ソケットディスクリプタ `new_fd` を使用することに注意してください。もし、一度しか接続がないのであれば、同じポートからの接続を防ぐために、`listen` している `sockfd` を `close()` することができます。
+
+### 5.7 send() and recv()—Talk to me, baby!
+この2つの関数は、ストリームソケットまたは接続されたデータグラムソケットで通信を行うためのものです。通常の非接続型データグラムソケットを使いたい場合は、以下の [5.8 sendto() and recvfrom()—Talk to me, DGRAM-style](#58-sendto-and-recvfrom-talk-to-me-dgram-style) のセクションを参照する必要があります。
+
+`send()`呼び出し。
+
+```cpp
+int send(int sockfd, const void *msg, int len, int flags);
+```
+
+`sockfd`はデータを送信したいソケットディスクリプタ（`socket()`で返されたものでも`accept()`で取得したものでも可）、 `msg`は送信したいデータへのポインタ、`len`はそのデータの長さ（バイト数）です。フラグを0に設定するだけです(フラグに関する詳しい情報は`send()`のマニュアルページを参照してください)。
+
+サンプルコードとしては、以下のようなものがあります。
+
+```cpp
+char *msg = "Beej was here!";
+int len, bytes_sent;
+.
+.
+.
+len = strlen(msg);
+bytes_sent = send(sockfd, msg, len, 0);
+.
+.
+.
+```
+
+`send()` は実際に送信されたバイト数を返しますが、これは送信するように指示した数よりも少ないかもしれません! つまり、大量のデータを送信するように指示しても、それが処理しきれないことがあるのです。その場合、できる限りのデータを送信し、残りは後で送信するように指示します。`send()` が返す値が `len` の値と一致しない場合、残りの文字列を送信するかどうかはあなた次第だということを覚えておいてください。良いニュースはこれです。パケットが小さければ(1K以下とか)、 おそらく全部を一度に送信することができるでしょう。ここでも、エラー時には -1 が返され、 errno にはエラー番号がセットされる。
+
+`recv()`呼び出しは、多くの点で類似しています。
+
+```cpp
+int recv(int sockfd, void *buf, int len, int flags);
+```
+
+`sockfd` は読み込むソケットディスクリプタ、`buf` は情報を読み込むバッファ、`len` はバッファの最大長、`flags` は再び 0 に設定できる(フラグについては `recv()` の man ページを参照)。
+
+`recv()` は、実際にバッファに読み込まれたバイト数を返し、エラーの場合は -1 を返す（それに応じて errno が設定される）。
+
+待ってください！`recv()`は0を返すことがあります。これは、リモート側が接続を切断したことを意味します! 0 という返り値は、`recv()` がこのような事態が発生したことをあなたに知らせるためのものです。
+
+ほら、簡単だったでしょう？これでストリームソケットでデータのやり取りができるようになったぞ。やったー! あなたはUnixネットワークプログラマーです!
+
+### 5.8 sendto() and recvfrom()—Talk to me, DGRAM-style
+"これはすべて素晴らしく、ダンディーだ"、"しかし、データグラムソケットを接続しないままにしておくのはどうなんだ"、という声が聞こえてきそうです。大丈夫だ、アミーゴ。ちょうどいいものがありますよ。
+
+データグラムソケットはリモートホストに接続されていないので、パケットを送信する前にどのような情報を与える必要があるか分かりますか？そうです! 宛先アドレスです! これがそのスクープです。
+
+```cpp
+int sendto(int sockfd, const void *msg, int len, unsigned int flags,
+		   const struct sockaddr *to, socklen_t tolen);
+```
+
+見ての通り、この呼び出しは基本的に`send()`の呼び出しと同じで、他に2つの情報が追加されています。`to`は`struct sockaddr`へのポインターで（おそらく直前にキャストした別の`struct sockaddr_in`や`struct sockaddr_in6`、`struct sockaddr_storage`になるでしょう）、送信先のIPアドレスとポートが含まれています。`tolen`は`int`型ですが、単純に`sizeof *to`または`sizeof(struct sockaddr_storage)`に設定することができます。
+
+宛先アドレスの構造体を手に入れるには、以下の`getaddrinfo()`や`recvfrom()`から取得するか、手で記入することになると思います。
+
+`send()` と同様、`sendto()` は実際に送信したバイト数 (これも、送信するように指示したバイト数よりも少ないかもしれません!) を返し、エラーの場合は -1 を返します。
+
+同様に、`recv()`と`recvfrom()`も類似しています。`recvfrom()`の概要は以下の通りです。
+
+```cpp
+int recvfrom(int sockfd, void *buf, int len, unsigned int flags,
+			 struct sockaddr *from, int *fromlen);
+```
+
+これも `recv()` と同様であるが、いくつかのフィールドが追加されています。`from` はローカルの `struct sockaddr_storage` へのポインタで、送信元のマシンの IP アドレスとポートが格納される。`fromlen` はローカルの `int` へのポインタであり、`sizeof *from` または `sizeof(struct sockaddr_storage)` に初期化する必要があります。この関数が戻ったとき、`fromlen`は実際に`from`に格納されたアドレスの長さを含みます。
+
+`recvfrom()` は受信したバイト数を返し、エラーの場合は -1 を返します（errno はそれに応じて設定されます）。
+
+そこで質問ですが、なぜソケットの型として `struct sockaddr_storage` を使うのでしょうか？なぜ、`struct sockaddr_in`ではないのでしょうか？なぜなら、私たちはIPv4やIPv6に縛られたくないからです。そこで、汎用的な構造体である`sockaddr_storage`を使用するのですが、これはどちらにも十分な大きさであることが分かっています。
+
+(そこで...ここでまた疑問なのですが、なぜ `struct sockaddr` 自体はどんなアドレスに対しても十分な大きさがないのでしょうか? 汎用構造体`sockaddr_storage`を汎用構造体`sockaddr`にキャストしているくらいなのに！？余計なことをしたような気がしますね。答えは、十分な大きさがなく、この時点で変更するのは問題がある、ということでしょう。だから新しいのを作ったんだ)。
+
+データグラムソケットを`connect()`すれば、すべてのトランザクションに`send()`と`recv()`を使用できることを覚えておいてください。ソケット自体はデータグラムソケットであり、パケットはUDPを使用しますが、ソケットインターフェイスが自動的に宛先と送信元の情報を追加してくれるのです。
+
+### 5.9 close() and shutdown()—Get outta my face!
+ふぅー 一日中データの送受信をしていて、もう限界だ。ソケットディスクリプタの接続を閉じる準備ができました。これは簡単です。通常のUnixファイルディスクリプタの`close()`関数を使えばいいのです。
+
+```cpp
+close(sockfd);
+```
+
+これにより、それ以上のソケットへの読み書きができなくなります。リモート側でソケットの読み書きをしようとすると、エラーが発生します。
+
+ソケットの閉じ方をもう少し制御したい場合は、`shutdown()`関数を使用します。この関数では、特定の方向、あるいは両方の通信を遮断することができます (ちょうど `close()` がそうであるように)。概要
+
+```cpp
+int shutdown(int sockfd, int how);
+```
+
+`sockfd` はシャットダウンしたいソケットファイル記述子、`how`は以下のいずれかです。
+
+| how | Effect                                              |
+|-----|-----------------------------------------------------|
+| 0   | それ以上の受信は不可                                |
+| 1   | それ以上の送信は禁止されています                    |
+| 2   | それ以上の送受信は禁止されています(close()のような) |
+
+`shutdown()`は成功すると0を、エラーが発生すると-1を返します（errnoは適宜設定されます）。
+
+データグラムソケットが接続されていない状態で `shutdown()` を使用すると、それ以降の `send()` および `recv()` 呼び出しに使用できなくなります (データグラムソケットを `connect()` した場合は、これらの呼び出しが可能であることを思い出してください)。
+
+`shutdown()` は実際にはファイルディスクリプタを閉じないことに注意することが重要です。ソケットディスクリプタを解放するには、`close()`を使用する必要があります。
+
+何もないんだけどね。
+
+(ただし、WindowsとWinsockを使用している場合は、`close()`ではなく`closesocket()`を呼び出すべきであることを忘れないでください)。
+
+### 5.10 getpeername()—Who are you?
+この関数はとても簡単です。
+
+あまりに簡単なので、ほとんど独自のセクションを設けなかったほどです。でも、とりあえずここに書いておきます。
+
+`getpeername()`関数は、接続されたストリームソケットのもう一方の端にいるのが誰であるかを教えてくれます。その概要は
+
+```cpp
+#include <sys/socket.h>
+
+int getpeername(int sockfd, struct sockaddr *addr, int *addrlen);
+```
+
+`sockfd` は接続したストリームソケットのディスクリプタ、`addr` は接続の相手側の情報を保持する `struct sockaddr` (または `struct sockaddr_in`) へのポインタ、`addrlen` は `int` へのポインタであり、 `sizeof *addr` または `sizeof(struct sockaddr)` で初期化される必要があります。
+
+この関数は，エラーが発生すると -1 を返し，それに応じて errno を設定します．
+
+アドレスがわかれば、`inet_ntop()`、`getnameinfo()`、`gethostbyaddr()`を使って、より詳しい情報を表示したり取得したりすることができます。いいえ、ログイン名を取得することはできません。(OK、OK。相手のコンピュータでidentデーモンが動いていれば、可能です。しかし、これはこのドキュメントの範囲外です。詳しくは [RFC 1413](https://datatracker.ietf.org/doc/html/rfc1413) をチェックしてください)。
+
+### 5.11 gethostname()—Who am I?
+`getpeername()`よりもさらに簡単なのは、`gethostname()`という関数です。これは、あなたのプログラムが動作しているコンピュータの名前を返します。この名前は、後述の `gethostbyname()` でローカルマシンの IP アドレスを決定するために使用されます。
+
+これ以上楽しいことはないでしょう？いくつか思いつきましたが、ソケットプログラミングには関係ないですね。とにかく、内訳はこんな感じです。
+
+```cpp
+#include <unistd.h>
+
+int gethostname(char *hostname, size_t size);
+```
+
+引数は単純で、`hostname`はこの関数が戻ったときにホスト名を格納する文字列の配列へのポインタ、`size`はホスト名配列のバイト長である。
+
+この関数は，正常に終了した場合は0を，エラーの場合は-1を返し，通常通りerrnoを設定します。
