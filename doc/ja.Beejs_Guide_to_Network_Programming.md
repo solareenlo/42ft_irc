@@ -626,7 +626,7 @@ int main(int argc, char *argv[])
 
 サンプル走行 みんな大好きスクリーンショット。
 
-```
+```shell
 $ showip www.example.net
 IP addresses for www.example.net:
 
@@ -642,7 +642,7 @@ IP addresses for ipv6.example.com:
 これで、`getaddrinfo()`の結果を他のソケット関数に渡して、ついにネットワーク接続を確立することができます。引き続きお読みください。
 
 ### 5.2 socket()—Get the File Descriptor!
-もう先延ばしにはできない。`socket()`システムコールの話をしなければならないのだ。以下はその内訳です。
+もう先延ばしにはできません。`socket()`システムコールの話をしなければならないのです。以下はその内訳です。
 
 ```cpp
 #include <sys/types.h>
@@ -928,9 +928,9 @@ bytes_sent = send(sockfd, msg, len, 0);
 int recv(int sockfd, void *buf, int len, int flags);
 ```
 
-`sockfd` は読み込むソケットディスクリプタ、`buf` は情報を読み込むバッファ、`len` はバッファの最大長、`flags` は再び 0 に設定できる(フラグについては `recv()` の man ページを参照)。
+`sockfd` は読み込むソケットディスクリプタ、`buf` は情報を読み込むバッファ、`len` はバッファの最大長、`flags` は再び 0 に設定できます(フラグについては `recv()` の man ページを参照)。
 
-`recv()` は、実際にバッファに読み込まれたバイト数を返し、エラーの場合は -1 を返す（それに応じて errno が設定される）。
+`recv()` は、実際にバッファに読み込まれたバイト数を返し、エラーの場合は -1 を返します（それに応じて errno が設定されます）。
 
 待ってください！`recv()`は0を返すことがあります。これは、リモート側が接続を切断したことを意味します! 0 という返り値は、`recv()` がこのような事態が発生したことをあなたに知らせるためのものです。
 
@@ -1048,7 +1048,7 @@ int gethostname(char *hostname, size_t size);
 ### 6.1 A Simple Stream Server
 このサーバがすることは、ストリーム接続で "Hello, world!" という文字列を送り出すだけです。このサーバをテストするために必要なことは、あるウィンドウでこのサーバを実行し、別のウィンドウからこのサーバにtelnetでアクセスすることだけです。
 
-```
+```shell
 $ telnet remotehostname 3490
 ```
 
