@@ -19,6 +19,11 @@ v3.1.5, Copyright © November 20, 2020
   * [3.3 structs](#33-structs)
   * [3.4 IP Addresses, Part Deux](#34-ip-addresses-part-deux)
     + [3.4.1 Private (Or Disconnected) Networks](#341-private-or-disconnected-networks)
+- [4 Jumping from IPv4 to IPv6](#4-jumping-from-ipv4-to-ipv6)
+- [5 System Calls or Bust](#5-system-calls-or-bust)
+  * [5.1 getaddrinfo()—Prepare to launch!](#51-getaddrinfo---prepare-to-launch-)
+  * [5.2 socket()—Get the File Descriptor!](#52-socket---get-the-file-descriptor-)
+  * [5.3 bind()—What port am I on?](#53-bind---what-port-am-i-on-)
 
 </details>
 
@@ -361,7 +366,7 @@ struct sockaddr_in sa; // IPv4
 struct sockaddr_in6 sa6; // IPv6
 
 inet_pton(AF_INET, "10.12.110.57", &(sa.sin_addr)); // IPv4
-inet_pton(AF_INET6, "2001:db8:63b3:1::3490", &(sa6.sin6_addr)); //
+inet_pton(AF_INET6, "2001:db8:63b3:1::3490", &(sa6.sin6_addr)); // IPv6
 ```
 
 (クイックメモ: 古い方法では、`inet_addr()`という関数や`inet_aton()`という別の関数を使っていましたが、これらはもう時代遅れでIPv6では動きません)
@@ -417,3 +422,326 @@ NATするファイアウォールの内側のネットワークは、これら�
 (楽しい事実! 私の外部IPアドレスは、本当は`192.0.2.33`ではないのです。`192.0.2.x` ネットワークは、このガイドのように、ドキュメントで使用するための架空の"本当の"IPアドレスとして予約されているのです! わーい、すごい！)
 
 IPv6にも、ある意味プライベートネットワークがあります。RFC 4193にあるように、fdXX:（将来的にはfcXX:）で始まります。しかし、NATとIPv6は一般的に混ざりません(このドキュメントの範囲外であるIPv6からIPv4へのゲートウェイを行う場合を除く)。理論的には、自由に使えるアドレスが非常に多くなるため、NATを使用する必要はなくなるはずです。しかし、外部にルーティングしないネットワーク上で自分のためにアドレスを割り当てたい場合は、このようにします。
+
+## 4 Jumping from IPv4 to IPv6
+しかし、IPv6で動作させるためには、私のコードのどこを変えればいいのか知りたいのです! 今すぐ教えてください!
+
+Ok! Ok!
+
+ここに書かれていることはほとんどすべて、私が上で説明したことですが、せっかちな人のためのショートバージョンです。(もちろん、これ以外にもありますが、このガイドに該当するのはこれです)。
+
+1. まず、構造体を手で詰めるのではなく、`getaddrinfo()`を使ってすべての`sockaddr`構造体の情報を取得するようにしてください。こうすることで、IPのバージョンに左右されず、また、その後の多くのステップを省くことができます。
+1. IPバージョンに関連する何かをハードコーディングしていることが分かったら、ヘルパー関数でラップするようにします。
+1. `AF_INET`を`AF_INET6`に変更します。
+1. `PF_INET`を`PF_INET6`に変更します。
+1. `INADDR_ANY` の割り当てを `in6addr_any` の割り当てに変更し、若干の差異が生じます。
+	```cpp
+	struct sockaddr_in sa;
+	struct sockaddr_in6 sa6;
+
+	sa.sin_addr.s_addr = INADDR_ANY;  // use my IPv4 address
+	sa6.sin6_addr = in6addr_any; // use my IPv6 address
+	```
+	また、`IN6ADDR_ANY_INIT`は、構造体`in6_addr`を宣言する際に、イニシャライザとして次のように使用することができます。
+	```cpp
+	struct in6_addr ia6 = IN6ADDR_ANY_INIT;
+	```
+1. `struct sockaddr_in` の代わりに `struct sockaddr_in6` を使用し、必要に応じてフィールドに "6" を追加してください（上記の [3.3 structs](#33-structs) を参照）。`sin6_zero`フィールドはありません。
+1. `struct in_addr` の代わりに `struct in6_addr` を使用し、必要に応じてフィールドに "6" を追加してください（上記の [3.3 structs](#33-structs) を参照）。
+1. `inet_aton()` や `inet_addr()` の代わりに、`inet_apton()` を使用してください。
+1. `inet_ntoa()`の代わりに`inet_ntop()`を使用してください。
+1. `gethostbyname()`の代わりに、優れた`getaddrinfo()`を使用してください。
+1. `gethostbyaddr()`の代わりに、優れた`getnameinfo()`を使用してください（`gethostbyaddr()`はIPv6でも動作可能です）。
+1. `INADDR_BROADCAST`は動作しなくなりました。代わりにIPv6マルチキャストを使用してください。
+
+出来上がり
+
+## 5 System Calls or Bust
+このセクションでは、Unix マシンのネットワーク機能にアクセスするためのシステムコールやその他のライブラリコールに触れることができますし、ソケット API をサポートしているあらゆるマシン (BSD, Windows, Linux, Mac, など) も同様です。これらの関数を呼び出すと、カーネルが引き継ぎ、すべての作業を自動で行ってくれます。
+
+このあたりで多くの人がつまづくのは、これらのものをどのような順序で呼び出すかということです。これについては、皆さんもお分かりのように、manページが役に立ちません。そこで、この恐ろしい状況を改善するために、以下のセクションのシステムコールを、あなたがプログラムの中で呼び出す必要があるのと全く（おおよそ）同じ順序で並べることにしました。
+
+これに、あちこちにあるサンプルコード、ミルクとクッキー（自分で用意しなければならないのが怖い）、そして生粋のガッツと勇気があれば、"ジョン・ポステルの息子"のようにインターネット上でデータを発信することができるのです!
+
+(なお、以下の多くのコードでは、簡潔にするため、必要なエラーチェックは行っていません。また、`getaddrinfo()`の呼び出しが成功し、リンクリストの有効なエントリを返すと仮定することが非常に一般的です。これらの状況はいずれもスタンドアロン・プログラムで適切に対処されているので、それらをモデルとして使用してください)。
+
+### 5.1 getaddrinfo()—Prepare to launch!
+この関数は多くのオプションを持つ真の主力関数ですが、使い方はいたってシンプルです。後で必要な構造体をセットアップするのに役立ちます。
+
+昔は、`gethostbyname()`という関数を使ってDNSのルックアップを行っていました。そして、その情報を `sockaddr_in` 構造体に手作業でロードし、それを呼び出しに使用するのです。
+
+これは、ありがたいことに、もう必要ありません。(IPv4とIPv6の両方で動作するコードを書きたいのであれば、望ましいことではありません!) 現代では、DNSやサービス名のルックアップなど、あらゆる種類の良いことをやってくれる`getaddrinfo()`という関数があり、さらに必要な構造体も埋めてくれます!
+
+それでは、ご覧ください。
+
+```cpp
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int getaddrinfo(const char *node,     // e.g. "www.example.com" or IP
+				const char *service,  // e.g. "http" or port number
+				const struct addrinfo *hints,
+				struct addrinfo **res);
+```
+
+この関数に3つの入力パラメータを与えると、結果のリンクリストであるresへのポインタが得られる。
+
+node パラメータには、接続先のホスト名、または IP アドレスを指定します。
+
+次にパラメータserviceですが、これは"80"のようなポート番号か、"http", "ftp", "telnet", "smtp"などの特定のサービスの名前（[IANAポートリスト](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml)やUnixマシンの`/etc/services`ファイルで見つけることができます）であることができます。
+
+最後に、`hints`パラメータは、関連情報をすでに記入した`addrinfo`構造体を指します。
+
+以下は、自分のホストのIPアドレス、ポート3490をリッスンしたいサーバーの場合の呼び出し例です。これは実際にはリスニングやネットワークの設定を行っていないことに注意してください。
+
+```cpp
+int status;
+struct addrinfo hints;
+struct addrinfo *servinfo;  // will point to the results
+
+memset(&hints, 0, sizeof hints); // make sure the struct is empty
+hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+
+if ((status = getaddrinfo(NULL, "3490", &hints, &servinfo)) != 0) {
+    fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+    exit(1);
+}
+
+// servinfo now points to a linked list of 1 or more struct addrinfos
+
+// ... do everything until you don't need servinfo anymore ....
+
+freeaddrinfo(servinfo); // free the linked-list
+```
+
+`ai_family`を`AF_UNSPEC`に設定することで、IPv4やIPv6を使うかどうかを気にしないことを表明していることに注意してください。もし、どちらか一方だけを使いたい場合は、`AF_INET`または`AF_INET6`に設定することができます。
+
+また、`AI_PASSIVE`フラグがあるのがわかると思いますが、これは`getaddrinfo()`にローカルホストのアドレスをソケット構造体に割り当てるように指示しています。これは、ハードコードする必要がないのがいいところです。(あるいは、`getaddrinfo()`の最初のパラメータとして特定のアドレスを入れることもできます。私は現在NULLを持っています。)
+
+そして、呼び出しを行います。エラー(`getaddrinfo()`が0以外を返す)があれば、ご覧のように関数 `gai_strerror()` を使ってそれを表示することができます。しかし、すべてがうまくいけば、`servinfo`は`struct addrinfos`のリンクリストを指し、それぞれのリストには後で使用できる何らかの`sockaddr`構造体が含まれています! 素晴らしい!
+
+最後に、`getaddrinfo()`が快く割り当ててくれたリンクリストをすべて使い終わったら、`freeaddrinfo()`を呼び出してすべてを解放することができます(そうすべき)です。
+
+ここでは、クライアントが特定のサーバー、例えば "www.example.net "ポート3490に接続したい場合のサンプルコールを紹介します。繰り返しますが、これは実際には接続しませんが、後で使用する構造をセットアップしています。
+
+```cpp
+int status;
+struct addrinfo hints;
+struct addrinfo *servinfo;  // will point to the results
+
+memset(&hints, 0, sizeof hints); // make sure the struct is empty
+hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+
+// get ready to connect
+status = getaddrinfo("www.example.net", "3490", &hints, &servinfo);
+
+// servinfo now points to a linked list of 1 or more struct addrinfos
+
+// etc.
+```
+
+`servinfo`は、あらゆるアドレス情報を持つリンクリストだと言い続けています。この情報を披露するために、簡単なデモプログラムを書いてみよう。[この短いプログラム](https://beej.us/guide/bgnet/examples/showip.c)は、コマンドラインで指定された任意のホストのIPアドレスを表示します。
+
+```cpp
+/*
+** showip.c -- show IP addresses for a host given on the command line
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+int main(int argc, char *argv[])
+{
+    struct addrinfo hints, *res, *p;
+    int status;
+    char ipstr[INET6_ADDRSTRLEN];
+
+    if (argc != 2) {
+        fprintf(stderr,"usage: showip hostname\n");
+        return 1;
+    }
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+    hints.ai_socktype = SOCK_STREAM;
+
+    if ((status = getaddrinfo(argv[1], NULL, &hints, &res)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+        return 2;
+    }
+
+    printf("IP addresses for %s:\n\n", argv[1]);
+
+    for(p = res;p != NULL; p = p->ai_next) {
+        void *addr;
+        char *ipver;
+
+        // get the pointer to the address itself,
+        // different fields in IPv4 and IPv6:
+        if (p->ai_family == AF_INET) { // IPv4
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+            addr = &(ipv4->sin_addr);
+            ipver = "IPv4";
+        } else { // IPv6
+            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+            addr = &(ipv6->sin6_addr);
+            ipver = "IPv6";
+        }
+
+        // convert the IP to a string and print it:
+        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+        printf("  %s: %s\n", ipver, ipstr);
+    }
+
+    freeaddrinfo(res); // free the linked list
+
+    return 0;
+}
+```
+
+ご覧のように、このコードはコマンドラインで渡されたものに対して `getaddrinfo()` を呼び出し、`res` が指すリンクリストを埋めて、そのリストを繰り返し表示して何かを出力したりすることができます。
+
+(そこには、IPバージョンによって異なるタイプの構造体`sockaddrs`を掘り下げなければならない、ちょっとした醜さがあります。申し訳ありません。他にいい方法はないかなぁ...)
+
+サンプル走行 みんな大好きスクリーンショット。
+
+```
+$ showip www.example.net
+IP addresses for www.example.net:
+
+  IPv4: 192.0.2.88
+
+$ showip ipv6.example.com
+IP addresses for ipv6.example.com:
+
+  IPv4: 192.0.2.101
+  IPv6: 2001:db8:8c00:22::171
+```
+
+これで、`getaddrinfo()`の結果を他のソケット関数に渡して、ついにネットワーク接続を確立することができます。引き続きお読みください。
+
+### 5.2 socket()—Get the File Descriptor!
+もう先延ばしにはできない。`socket()`システムコールの話をしなければならないのだ。以下はその内訳です。
+
+```cpp
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+```
+
+しかし、これらの引数は何なのでしょうか？これらは、どのようなソケットが欲しいか（IPv4かIPv6か、ストリームかデータグラムか、TCPかUDPか）を指定することができます。
+
+以前は、これらの値をハードコードする人がいましたが、今でも絶対にそうすることができます。(ドメインは `PF_INET` または `PF_INET6`、タイプは `SOCK_STREAM` または `SOCK_DGRAM`、プロトコルは 0 に設定すると、与えられたタイプに適したプロトコルを選択することができます。あるいは `getprotobyname()` を呼んで、"tcp" や "udp" などの欲しいプロトコルを調べることもできます)。
+
+(この`PF_INET`は、`sockaddr_in`構造体の`sin_family`フィールドを初期化するときに使用できる`AF_INET`の近縁種です。実際、両者は非常に密接な関係にあり、実際に同じ値を持っているので、多くのプログラマは`socket()`を呼び出して`PF_INET`の代わりに`AF_INET`を第一引数に渡しています。さて、ミルクとクッキーを用意して、お話の時間です。昔々、あるアドレスファミリ(`AF_INET`のAF)が、プロトコルファミリ(`PF_INET`のPF)で参照される複数のプロトコルをサポートするかもしれないと考えられたことがあります。しかし、そうはならなかった。そして、みんな幸せに暮らした、ザ・エンド。というわけで、最も正しいのは `struct sockaddr_in` で `AF_INET` を使い、`socket()` の呼び出しで `PF_INET` を使うことです)。
+
+とにかく、もう十分です。本当にやりたいことは、`getaddrinfo()`の呼び出しの結果の値を使い、以下のように直接`socket()`に送り込むことです。
+
+```cpp
+int s;
+struct addrinfo hints, *res;
+
+// do the lookup
+// [pretend we already filled out the "hints" struct]
+getaddrinfo("www.example.com", "http", &hints, &res);
+
+// again, you should do error-checking on getaddrinfo(), and walk
+// the "res" linked list looking for valid entries instead of just
+// assuming the first one is good (like many of these examples do).
+// See the section on client/server for real examples.
+
+s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+```
+
+`socket()` は単に、後のシステムコールで使用できるソケットディスクリプタを返すか、エラーの場合は -1 を返します。グローバル変数 errno にはエラーの値が設定されます (詳細については errno のマニュアルページを参照してください。また、マルチスレッドプログラムで errno を使用する際の簡単な注意も参照してください)。
+
+でも、このソケットは何の役に立つのでしょうか？答えは、これだけでは本当に意味がなく、もっと読み進めてシステムコールを作らないと意味がないのです。
+
+### 5.3 bind()—What port am I on?
+ソケットを取得したら、そのソケットをローカルマシンのポートに関連付ける必要があるかもしれません。(これは、特定のポートへの接続を `listen()` する場合によく行われます。多人数参加型ネットワークゲームで "192.168.5.10 ポート 3490 に接続" と指示されたときに行います)。ポート番号はカーネルが受信パケットを特定のプロセスのソケットディスクリプタにマッチさせるために使用されます。もしあなたが`connect()`を行うだけなら(あなたはクライアントであり、サーバではないので)、これはおそらく不要でしょう。とにかく読んでみてください。
+
+`bind()`システムコールの概要は以下のとおりです。
+
+```cpp
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int bind(int sockfd, struct sockaddr *my_addr, int addrlen);
+```
+
+`sockfd` は `socket()` が返すソケットファイル記述子です。 `my_addr` は自分のアドレスに関する情報、すなわちポートおよび IP アドレスを含む `sockaddr` 構造体へのポインタです。
+
+ふぅー。一度に吸収するのはちょっと無理があるな。ソケットをプログラムが実行されているホスト、ポート3490にバインドする例を見てみましょう。
+
+```cpp
+struct addrinfo hints, *res;
+int sockfd;
+
+// first, load up address structs with getaddrinfo():
+
+memset(&hints, 0, sizeof hints);
+hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+hints.ai_socktype = SOCK_STREAM;
+hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+
+getaddrinfo(NULL, "3490", &hints, &res);
+
+// make a socket:
+
+sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+// bind it to the port we passed in to getaddrinfo():
+
+bind(sockfd, res->ai_addr, res->ai_addrlen);
+```
+
+`AI_PASSIVE`フラグを使うことで、プログラムが動作しているホストのIPにバインドするように指示しているのです。もし、特定のローカルIPアドレスにバインドしたい場合は、`AI_PASSIVE`を削除して、`getaddrinfo()`の最初の引数にIPアドレスを入れてください。
+
+`bind()`もエラー時には-1を返し、errnoにエラーの値を設定します。
+
+多くの古いコードでは、`bind()`を呼び出す前に、`sockaddr_in`構造体を手動でパックしています。これは明らかにIPv4特有のものですが、IPv6で同じことをするのを止めるものは何もありません。ただし、一般的には`getaddrinfo()`を使う方が簡単になりそうです。とにかく、古いコードは次のようなものです。
+
+```cpp
+// !!! THIS IS THE OLD WAY !!!
+
+int sockfd;
+struct sockaddr_in my_addr;
+
+sockfd = socket(PF_INET, SOCK_STREAM, 0);
+
+my_addr.sin_family = AF_INET;
+my_addr.sin_port = htons(MYPORT);     // short, network byte order
+my_addr.sin_addr.s_addr = inet_addr("10.12.110.57");
+memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
+
+bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
+```
+
+上記のコードでは、ローカルのIPアドレスにバインドしたい場合、`s_addr`フィールドに`INADDR_ANY`を代入することもできます（上記の`AI_PASSIVE`フラグのようなものです）。`INADDR_ANY`のIPv6バージョンはグローバル変数`in6addr_any`で、 `struct sockaddr_in6` の `sin6_addr` フィールドに代入されます。 (変数の初期化で使用できるマクロ `IN6ADDR_ANY_INIT` も存在します。)また、`IN6ADDR_ANY_INIT`を使用することで、IPv6のIPアドレスにバインドできます。
+
+`bind()`を呼ぶときにもうひとつ気をつけなければならないのは、 ポート番号で下手を打たないことです。1024以下のポートはすべて予約済みです(あなたがスーパーユーザでない限り)! それ以上のポート番号は、(他のプログラムによってすでに使われていなければ) 65535 までの任意のポート番号を使用することができます。
+
+時々、サーバーを再実行しようとすると、`bind()`が "Address already in use" と言って失敗することに気がつくかもしれません。これはどういうことでしょう? それは、接続されたソケットの一部がまだカーネル内に残っていて、ポートを占有しているのです。それが消えるのを待つか(1分くらい)、次のようにポートが再利用できるようなコードをプログラムに追加します。
+
+```cpp
+int yes=1;
+//char yes='1'; // Solaris people use this
+
+// lose the pesky "Address already in use" error message
+if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) {
+    perror("setsockopt");
+    exit(1);
+}
+```
+
+`bind()`について、最後にちょっとした注意点があります。`bind()`を絶対に呼び出す必要がない場合があります。リモートマシンに `connect()` する際に、ローカルポートを気にしない場合 (telnet のようにリモートポートを気にする場合) は、単に `connect()` をコールすれば、ソケットが未束縛かどうかをチェックし、必要なら未使用のローカルポートに `bind()` してくれます。
