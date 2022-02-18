@@ -5,12 +5,12 @@
 - [ソケットとは](http://research.nii.ac.jp/~ichiro/syspro98/socket.html)
 
 ### IRC Documentation
-- [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol ([ja](https://github.com/solareenlo/42ft_irc/blob/main/doc/ja.rfc1459.md))
-- [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture ([ja](https://tex2e.github.io/rfc-translater/html/rfc2810.html))
-- [RFC2811](https://tools.ietf.org/html/rfc2811): Channel Management ([ja](https://tex2e.github.io/rfc-translater/html/rfc2811.html))
-- [RFC2812](https://tools.ietf.org/html/rfc2812): Client Protocol ([ja](https://tex2e.github.io/rfc-translater/html/rfc2812.html))
-- [RFC2813](https://tools.ietf.org/html/rfc2813): Server Protocol ([ja](https://tex2e.github.io/rfc-translater/html/rfc2813.html))
-- [RFC7194](https://tools.ietf.org/html/rfc7194): Default Port for Internet Relay Chat (IRC) via TLS/SSL ([ja](https://tex2e.github.io/rfc-translater/html/rfc7194.html))
+- [RFC1459](https://tools.ietf.org/html/rfc1459): Protocol ([ja](https://solareenlo.com/rfc1459/))
+- [RFC2810](https://tools.ietf.org/html/rfc2810): Architecture ([ja](https://solareenlo.com/rfc2810/))
+- [RFC2811](https://tools.ietf.org/html/rfc2811): Channel Management ([ja](https://solareenlo.com/rfc2811/))
+- [RFC2812](https://tools.ietf.org/html/rfc2812): Client Protocol ([ja](https://solareenlo.com/rfc2812/))
+- [RFC2813](https://tools.ietf.org/html/rfc2813): Server Protocol ([ja](https://solareenlo.com/rfc2813/))
+- [RFC7194](https://tools.ietf.org/html/rfc7194): Default Port for Internet Relay Chat (IRC) via TLS/SSL ([ja](https://solareenlo.com/rfc7194/))
 - [RFC952](https://datatracker.ietf.org/doc/html/rfc952): DOD INTERNET HOST TABLE SPECIFICATION
 
 ### Docs
@@ -20,7 +20,7 @@
 
 ### Article
 - [Beej's Guide to Network Programming Using Internet Sockets](https://beej.us/guide/bgnet/)
-- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/) ([ja](https://github.com/solareenlo/42ft_irc/blob/main/doc/ja.Beejs_Guide_to_Network_Programming.md))
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/) ([ja](https://solareenlo.com/bgnet/))
 - [Beej's cheesy chat example](https://beej.us/guide/bgnet/examples/selectserver.c)
 - [Modern IRC Client Protocol](https://modern.ircdocs.horse/)
 - [A typical client-server program flow chart](https://www.ibm.com/docs/en/zos/2.4.0?topic=internets-typical-client-server-program-flow-chart#o4ag1__tiptcp)
