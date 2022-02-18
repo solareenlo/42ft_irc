@@ -1,0 +1,6 @@
+BasedOnStyle: Google
+IndentWidth: 4
+AccessModifierOffset: -3
+Standard: Cpp03
+AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+ColumnLimit: 80
